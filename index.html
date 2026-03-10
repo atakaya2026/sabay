@@ -36,13 +36,13 @@
   }
   .kbd-grid {
     display: grid; grid-template-columns: repeat(8, 1fr);
-    gap: 5px; max-width: 620px; margin: 0 auto;
+    gap: 1.2vw; max-width: 620px; margin: 0 auto;
   }
   .key {
-    height: 52px; border-radius: 8px;
+    height: 10.5vw; border-radius: 6px;
     display: flex; flex-direction: column; justify-content: center; align-items: center;
-    cursor: pointer; user-select: none; box-shadow: 0 3px 0 rgba(0,0,0,0.3);
-    font-size: 20px; font-weight: bold; position: relative;
+    cursor: pointer; user-select: none; box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+    font-size: 5.5vw; font-weight: bold; position: relative;
     -webkit-tap-highlight-color: transparent;
   }
   .key:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
@@ -50,33 +50,33 @@
   .key-consonant { background: #fff; color: #1a1208; }
   .key-consonant.o-series { color: #1a5fb4; }
   .key-consonant.first-col { background: #daeeff; }
-  .key-next { background: #fde68a; color: #78350f; font-size: 13px; font-weight: 900; }
-  .key-onext { background: #fde68a; color: #78350f; font-size: 13px; font-weight: 900; }
-  .key-vowel { background: #ffffff; color: #1a5228; font-size: 15px; }
-  .key-func { background: #8e8e93; color: #fff; font-size: 18px; font-weight: 700; }
-  .key-user { background: #d1d5db; color: #6b7280; font-size: 9px; }
-  .key-popup-char { background: #fff3e0; color: #7c4f00; font-size: 16px; }
+  .key-next { background: #fde68a; color: #78350f; font-size: 3.2vw; font-weight: 900; }
+  .key-onext { background: #fde68a; color: #78350f; font-size: 3.2vw; font-weight: 900; }
+  .key-vowel { background: #ffffff; color: #1a5228; font-size: 3.5vw; }
+  .key-func { background: #8e8e93; color: #fff; font-size: 4.5vw; font-weight: 700; }
+  .key-user { background: #d1d5db; color: #6b7280; font-size: 2vw; }
+  .key-popup-char { background: #fff3e0; color: #7c4f00; font-size: 3.8vw; }
 
-  .multi-label { display: flex; gap: 2px; font-size: 13px; flex-wrap: wrap; justify-content: center; line-height: 1.2; }
-  .multi-label span { font-size: 13px; }
-  .key-vowel.large { font-size: 24px; }
+  .multi-label { display: flex; gap: 1px; flex-wrap: nowrap; justify-content: center; align-items: center; line-height: 1; }
+  .multi-label span { font-size: 3.2vw; }
+  .key-vowel.large { font-size: 4vw; }
 
-  .bottom-bar { grid-column: span 8; display: grid; grid-template-columns: 2fr 4fr 2fr; gap: 5px; margin-top: 2px; }
+  .bottom-bar { grid-column: span 8; display: grid; grid-template-columns: 2fr 4fr 2fr; gap: 4px; margin-top: 2px; }
   .key-space {
-    background: #fff; color: #3b3228; font-size: 12px; height: 46px; border-radius: 8px;
+    background: #fff; color: #3b3228; font-size: 3vw; height: 10vw; border-radius: 6px;
     display: flex; justify-content: center; align-items: center;
-    cursor: pointer; box-shadow: 0 3px 0 rgba(0,0,0,0.25);
+    cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,0.25);
     user-select: none; font-weight: bold; -webkit-tap-highlight-color: transparent;
   }
   .key-space:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
   .key-space.stack-active { background: #fef3c7; border: 2px solid #f59e0b; }
   .key-123, .key-enter {
-    background: #8e8e93; color: #fff; height: 46px; border-radius: 8px;
+    background: #8e8e93; color: #fff; height: 10vw; border-radius: 6px;
     display: flex; justify-content: center; align-items: center;
-    cursor: pointer; box-shadow: 0 3px 0 rgba(0,0,0,0.25);
-    font-weight: bold; font-size: 14px; user-select: none;
+    cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,0.25);
+    font-weight: bold; font-size: 3.5vw; user-select: none;
   }
-  .key-enter { font-size: 18px; }
+  .key-enter { font-size: 4.5vw; }
   .key-123:active, .key-enter:active { transform: translateY(2px); box-shadow: none; }
 
   #popup-overlay {
