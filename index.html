@@ -49,7 +49,7 @@
   #keyboard-wrap {
     position: relative;
     width: 100%;
-    padding-bottom: calc(env(safe-area-inset-bottom) + 10px);
+    flex-shrink: 0;
     border-top: 1px solid #888;
     background: #b5b0a8;
   }
@@ -88,7 +88,7 @@
   /* 스페이스 텍스트 표시 */
   .kbd-space-label {
     position: absolute;
-    font-size: clamp(10px, 3vw, 14px); font-weight: bold; color: #3b3228;
+    font-size: clamp(13px, 3.8vw, 18px); font-weight: bold; color: #3b3228;
     pointer-events: none;
     display: flex; align-items: center; justify-content: center;
   }
@@ -136,10 +136,10 @@
   .key-enter { font-size: clamp(10px, 3.5vw, 20px); }
   .key-123:active, .key-enter:active { transform: translateY(2px); box-shadow: none; }
 
-/* 3. 팝업 오버레이: fixed를 absolute로 변경하여 부모 안에서 꽉 차게 설정 */
+/* 3. 팝업 오버레이: phone-wrap 기준 absolute */
   #popup-overlay {
     display: none; 
-    position: absolute; /* fixed에서 변경 */
+    position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.6); 
     z-index: 2000;
@@ -149,7 +149,7 @@
   #popup-overlay.show { display: flex; }
   #popup-keyboard {
     background: #b5b0a8;
-    padding: 8px 4px calc(10px + env(safe-area-inset-bottom));
+    padding: 8px 4px 10px;
     border-top: 2px solid #c8a96e;
     width: 100%;
     box-sizing: border-box;
@@ -401,6 +401,8 @@ function handleVowel(keyId, chars) {
     state.vowelTapIdx = 0;
     appendText(chars[0]);
   }
+  state.activeRoot = null;
+  state.activeCharIdx = 0;
   render();
 }
 
