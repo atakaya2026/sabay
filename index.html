@@ -7,9 +7,20 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
-    height: 100%; background: #e8e4dc;
+    height: 100%; background: #6b7280;
     font-family: 'Noto Sans Khmer', 'Khmer OS', sans-serif;
-    overflow: hidden; display: flex; flex-direction: column;
+    overflow: hidden; display: flex; justify-content: center; align-items: center;
+  }
+  #phone-wrap {
+    width: min(100%, 480px);
+    height: min(100vh, 900px);
+    display: flex;
+    flex-direction: column;
+    background: #e8e4dc;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
   }
   #action-bar {
     display: flex; align-items: center; justify-content: space-between;
@@ -60,17 +71,17 @@
   }
   .kbd-btn:active { opacity: 0.5; }
   /* 자음 버튼 */
-  .kbd-consonant { font-size: 5.5vw; color: #1a1208; }
+  .kbd-consonant { font-size: clamp(12px, 5.5vw, 26px); color: #1a1208; }
   .kbd-consonant.o-series { color: #1a5fb4; }
   /* 다음키 버튼 (노란 키 위에 텍스트 표시) */
-  .kbd-next { font-size: 3.5vw; color: #78350f; font-weight: 900; }
-  .kbd-onext { font-size: 3.5vw; color: #78350f; font-weight: 900; }
+  .kbd-next { font-size: clamp(10px, 3.5vw, 17px); color: #78350f; font-weight: 900; }
+  .kbd-onext { font-size: clamp(10px, 3.5vw, 17px); color: #78350f; font-weight: 900; }
   /* 투명 클릭 영역 (부호/BS/스페이스/엔터/123) */
   .kbd-vowel, .kbd-func, .kbd-space, .kbd-enter, .kbd-123 { font-size: 0; }
   /* 스페이스 텍스트 표시 */
   .kbd-space-label {
     position: absolute;
-    font-size: 3vw; font-weight: bold; color: #3b3228;
+    font-size: clamp(10px, 3vw, 14px); font-weight: bold; color: #3b3228;
     pointer-events: none;
     display: flex; align-items: center; justify-content: center;
   }
@@ -92,17 +103,17 @@
   .key-consonant { background: #fff; color: #1a1208; }
   .key-consonant.o-series { color: #1a5fb4; }
   .key-consonant.first-col { background: #daeeff; }
-  .key-next { background: #fde68a; color: #78350f; font-size: 3.2vw; font-weight: 900; }
-  .key-onext { background: #fde68a; color: #78350f; font-size: 3.2vw; font-weight: 900; }
-  .key-vowel { background: #ffffff; color: #1a5228; font-size: 3.5vw; }
-  .key-func { background: #8e8e93; color: #fff; font-size: 4.5vw; font-weight: 700; }
-  .key-user { background: #d1d5db; color: #6b7280; font-size: 2vw; }
-  .key-popup-char { background: #fff3e0; color: #7c4f00; font-size: 3.8vw; }
+  .key-next { background: #fde68a; color: #78350f; font-size: clamp(7px, 2.5vw, 14px); font-weight: 900; }
+  .key-onext { background: #fde68a; color: #78350f; font-size: clamp(7px, 2.5vw, 14px); font-weight: 900; }
+  .key-vowel { background: #ffffff; color: #1a5228; font-size: clamp(7px, 2.8vw, 16px); }
+  .key-func { background: #8e8e93; color: #fff; font-size: clamp(10px, 3.5vw, 20px); font-weight: 700; }
+  .key-user { background: #d1d5db; color: #6b7280; font-size: clamp(8px, 1.8vw, 12px); }
+  .key-popup-char { background: #fff3e0; color: #7c4f00; font-size: clamp(8px, 2.8vw, 18px); }
   .multi-label { display: flex; gap: 1px; flex-wrap: nowrap; justify-content: center; align-items: center; line-height: 1; }
-  .multi-label span { font-size: 3.2vw; }
+  .multi-label span { font-size: clamp(7px, 2.5vw, 14px); }
   .bottom-bar { grid-column: span 8; display: grid; grid-template-columns: 2fr 4fr 2fr; gap: 4px; margin-top: 2px; }
   .key-space {
-    background: #fff; color: #3b3228; font-size: 3vw; height: 11vw; border-radius: 6px;
+    background: #fff; color: #3b3228; font-size: clamp(8px, 2.5vw, 14px); height: 11vw; border-radius: 6px;
     display: flex; justify-content: center; align-items: center;
     cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,0.25);
     user-select: none; font-weight: bold; -webkit-tap-highlight-color: transparent;
@@ -113,21 +124,43 @@
     background: #8e8e93; color: #fff; height: 11vw; border-radius: 6px;
     display: flex; justify-content: center; align-items: center;
     cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,0.25);
-    font-weight: bold; font-size: 3.5vw; user-select: none;
+    font-weight: bold; font-size: clamp(8px, 2.8vw, 16px); user-select: none;
   }
-  .key-enter { font-size: 4.5vw; }
+  .key-enter { font-size: clamp(10px, 3.5vw, 20px); }
   .key-123:active, .key-enter:active { transform: translateY(2px); box-shadow: none; }
 
   #popup-overlay {
-    display: none; position: fixed; inset: 0;
+    display: none; position: fixed;
     background: rgba(0,0,0,0.4); z-index: 100;
     justify-content: flex-end; flex-direction: column;
   }
   #popup-overlay.show { display: flex; }
   #popup-keyboard {
     background: #b5b0a8;
-    padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+    padding: 8px 4px 10px;
     border-top: 2px solid #c8a96e;
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+  #popup-keyboard .kbd-grid {
+    max-width: 100%;
+    gap: 6px;
+  }
+  #popup-keyboard .key {
+    height: 64px;
+    max-height: 64px;
+    font-size: clamp(8px, 2.8vw, 20px);
+    aspect-ratio: unset;
+  }
+  #popup-keyboard .key-space,
+  #popup-keyboard .key-123,
+  #popup-keyboard .key-enter {
+    height: 52px;
+    max-height: 52px;
+    aspect-ratio: unset;
+    padding: 0;
+    font-size: clamp(8px, 2.5vw, 16px);
   }
 
   .diacritic-wrap {
@@ -148,7 +181,7 @@
 </style>
 </head>
 <body>
-
+<div id="phone-wrap">
 <div id="action-bar">
   <span class="title">សបាយគី · Sabay Key</span>
   <button class="action-btn reset" onclick="resetAll()">↺ ជម្រះ</button>
@@ -163,6 +196,7 @@
     <div class="kbd-grid" id="popup-kbd"></div>
   </div>
 </div>
+</div><!-- phone-wrap -->
 
 <script>
 const consonantRows = {
@@ -399,7 +433,13 @@ function openPopup() {
   state.popupTapIdx = 0;
   state.popupCharEntered = false;
   renderPopup();
-  document.getElementById('popup-overlay').classList.add('show');
+  const overlay = document.getElementById('popup-overlay');
+  const rect = document.getElementById('phone-wrap').getBoundingClientRect();
+  overlay.style.left   = rect.left   + 'px';
+  overlay.style.top    = rect.top    + 'px';
+  overlay.style.width  = rect.width  + 'px';
+  overlay.style.height = rect.height + 'px';
+  overlay.classList.add('show');
 }
 function closePopup() {
   document.getElementById('popup-overlay').classList.remove('show');
@@ -591,7 +631,8 @@ function renderPopup() {
         });
       } else {
         k = makeKey('key-user', 'user', () => {
-          alert('이 키는 유저가 저장한 문구를 입력할 수 있는 키입니다. [확인]');
+          appendText('វាក្យស្ព័ន្ធនេះត្រូវបានចុះឈ្មោះដោយអ្នកប្រើប្រាស់។');
+          closePopup();
         });
       }
       pkbd.appendChild(k);
