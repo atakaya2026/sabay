@@ -1,714 +1,134 @@
 <!DOCTYPE html>
 <html lang="km">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-/* 1. 전체 배경: 화면 하단 정렬 */
-  html, body {
-    height: 100%; background: #6b7280;
-    font-family: 'Noto Sans Khmer', 'Khmer OS', sans-serif;
-    overflow: hidden; 
-    display: flex; 
-    justify-content: center; 
-    align-items: flex-end; /* 화면 바닥으로 밀착 */
-  }
-/* 2. 폰 랩퍼: 밑에 여백이 생기지 않도록 수정 */
-#phone-wrap {
-    width: min(100%, 480px);
-    height: 100%; /* 부모 높이만큼 꽉 채움 */
-    max-height: 900px;
-    display: flex;
-    flex-direction: column;
-    background: #e8e4dc;
-    box-shadow: 0 -5px 40px rgba(0,0,0,0.5);
-    border-radius: 12px 12px 0 0; /* 위쪽만 둥글게 */
-    position: relative;
-    overflow: hidden;
-  }
-  #action-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 12px; background: #3b3228; border-bottom: 2px solid #c8a96e;
-  }
-  #action-bar .title { color: #c8a96e; font-size: 15px; font-weight: bold; letter-spacing: 1px; }
-  .action-btn { padding: 5px 12px; border-radius: 6px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; }
-  .action-btn.reset { background: #6b7280; color: #fff; }
-
-  #editor {
-    flex: 1; width: 100%; background: #faf7f2;
-    padding: 16px 20px; font-size: 30px; line-height: 1.8;
-    border: none; outline: none; overflow-y: auto;
-    white-space: pre-wrap; word-break: break-all; color: #1a1208;
-  }
-  #editor::after { content: none; }
-  .cursor { color: #c8a96e; animation: blink 1s step-end infinite; font-weight: 100; }
-  @keyframes blink { from, to { opacity: 0; } 50% { opacity: 1; } }
-
-  #keyboard-wrap {
-    position: relative;
-    width: 100%;
-    flex-shrink: 0;
-    border-top: 1px solid #888;
-    background: #b5b0a8;
-  }
-  #kbd-image {
-    display: block;
-    width: 100%;
-    height: auto;
-    user-select: none;
-    -webkit-user-drag: none;
-  }
-  #kbd {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-  }
-  /* 투명 버튼 공통 */
-  .kbd-btn {
-    position: absolute;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Noto Sans Khmer', sans-serif;
-    font-weight: bold;
-  }
-  .kbd-btn:active { opacity: 0.5; }
-  /* 자음 버튼 */
-  .kbd-consonant { font-size: clamp(12px, 5.5vw, 26px); color: #1a1208; }
-  .kbd-consonant.o-series { color: #1a5fb4; }
-  /* 다음키 버튼 (노란 키 위에 텍스트 표시) */
-  .kbd-next { font-size: clamp(10px, 3.5vw, 17px); color: #78350f; font-weight: 900; }
-  .kbd-onext { font-size: clamp(10px, 3.5vw, 17px); color: #78350f; font-weight: 900; }
-  /* 투명 클릭 영역 (부호/BS/스페이스/엔터/123) */
-  .kbd-vowel, .kbd-func, .kbd-space, .kbd-enter, .kbd-123 { font-size: 0; }
-  /* 스페이스 텍스트 표시 */
-  .kbd-space-label {
-    position: absolute;
-    font-size: clamp(13px, 3.8vw, 18px); font-weight: bold; color: #3b3228;
-    pointer-events: none;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .kbd-space.stack-active + .kbd-space-label { color: #d97706; }
-
-  /* 팝업은 그대로 grid 방식 유지 */
-  .kbd-grid {
-    display: grid; grid-template-columns: repeat(8, 1fr);
-    gap: 1.2vw; max-width: 620px; margin: 0 auto;
-  }
-  .key {
-    height: 11.75vw; border-radius: 6px;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    cursor: pointer; user-select: none; box-shadow: 0 2px 0 rgba(0,0,0,0.3);
-    font-size: 5.5vw; font-weight: bold; position: relative;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .key:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
-  .key-consonant { background: #fff; color: #1a1208; }
-  .key-consonant.o-series { color: #1a5fb4; }
-  .key-consonant.first-col { background: #daeeff; }
-  .key-next { background: #fde68a; color: #78350f; font-size: clamp(7px, 2.5vw, 14px); font-weight: 900; }
-  .key-onext { background: #fde68a; color: #78350f; font-size: clamp(7px, 2.5vw, 14px); font-weight: 900; }
-  .key-vowel { background: #ffffff; color: #1a5228; font-size: clamp(7px, 2.8vw, 16px); }
-  .key-func { background: #8e8e93; color: #fff; font-size: clamp(10px, 3.5vw, 20px); font-weight: 700; }
-  .key-user { background: #d1d5db; color: #6b7280; font-size: clamp(8px, 1.8vw, 12px); }
-  .key-popup-char { background: #fff3e0; color: #7c4f00; font-size: clamp(14px, 4vw, 30px); }
-  .multi-label { display: flex; gap: 1px; flex-wrap: nowrap; justify-content: center; align-items: center; line-height: 1; }
-  .multi-label span { font-size: clamp(12px, 3.5vw, 22px); }
-  .bottom-bar { grid-column: span 8; display: grid; grid-template-columns: 2fr 4fr 2fr; gap: 4px; margin-top: 2px; }
-  .key-space {
-    background: #fff; color: #3b3228; font-size: clamp(8px, 2.5vw, 14px); height: 11vw; border-radius: 6px;
-    display: flex; justify-content: center; align-items: center;
-    cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,0.25);
-    user-select: none; font-weight: bold; -webkit-tap-highlight-color: transparent;
-  }
-  .key-space:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
-  .key-space.stack-active { background: #fef3c7; border: 2px solid #f59e0b; }
-  .key-123, .key-enter {
-    background: #8e8e93; color: #fff; height: 11vw; border-radius: 6px;
-    display: flex; justify-content: center; align-items: center;
-    cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,0.25);
-    font-weight: bold; font-size: clamp(8px, 2.8vw, 16px); user-select: none;
-  }
-  .key-enter { font-size: clamp(10px, 3.5vw, 20px); }
-  .key-123:active, .key-enter:active { transform: translateY(2px); box-shadow: none; }
-
-/* 3. 팝업 오버레이: phone-wrap 기준 absolute */
-  #popup-overlay {
-    display: none; 
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: transparent;
-    z-index: 2000;
-    justify-content: flex-end; 
-    flex-direction: column;
-  }
-  #popup-overlay.show { display: flex; }
-  #popup-keyboard {
-    background: #b5b0a8;
-    padding: 8px 4px 10px;
-    border-top: 2px solid #c8a96e;
-    width: 100%;
-    box-sizing: border-box;
-    flex-shrink: 0;
-  }
-  #popup-keyboard .kbd-grid {
-    max-width: 100%;
-    gap: 6px;
-  }
-  #popup-keyboard .key {
-    height: 64px;
-    max-height: 64px;
-    font-size: clamp(14px, 4.2vw, 32px);
-    aspect-ratio: unset;
-  }
-  #popup-keyboard .key-space,
-  #popup-keyboard .key-123,
-  #popup-keyboard .key-enter {
-    height: 52px;
-    max-height: 52px;
-    aspect-ratio: unset;
-    padding: 0;
-    font-size: clamp(8px, 2.5vw, 16px);
-  }
-
-  .diacritic-wrap {
-    display: inline-block;
-    overflow: hidden;
-    position: relative;
-  }
-  .diacritic-base {
-    visibility: hidden;
-    font-size: inherit;
-  }
-    position: absolute; top: -28px; left: 50%; transform: translateX(-50%);
-    background: #f59e0b; color: #3b3228; font-size: 11px; padding: 3px 12px;
-    border-radius: 10px; font-weight: bold; display: none; white-space: nowrap;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  }
-  #stack-indicator.show { display: block; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>សបយក</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="images/logo.png" type="image/png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+        body { font-family: 'Noto Sans KR', sans-serif; word-break: keep-all; }
+    </style>
 </head>
-<body>
-<div id="phone-wrap">
-<div id="action-bar">
-  <span class="title">សបាយគី · Sabay Key</span>
-  <button class="action-btn reset" onclick="resetAll()">↺ ជម្រះ</button>
-</div>
-<div id="editor"></div>
-<div id="keyboard-wrap">
-  <img id="kbd-image" src="" alt="keyboard" draggable="false" />
-  <div id="kbd"></div>
-</div>
-<div id="popup-overlay">
-  <div id="popup-keyboard">
-    <div class="kbd-grid" id="popup-kbd"></div>
-  </div>
-</div>
-</div><!-- phone-wrap -->
+<body class="bg-gray-50 text-gray-900 leading-relaxed">
 
-<script>
-const consonantRows = {
-  'ក': ['ក','ខ','គ','ឃ','ង'],
-  'ច': ['ច','ឆ','ជ','ឈ','ញ'],
-  'ដ': ['ដ','ឋ','ឌ','ឍ','ណ'],  // 특수: 인덱스1→인덱스4 점프
-  'ត': ['ត','ថ','ទ','ធ','ន'],
-  'ប': ['ប','ផ','ព','ភ','ម'],
-  'យ': ['យ','រ','ល','វ'],
-  'ស': ['ស','ហ','ឡ','អ'],
-};
+<nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+        <a href="#"><img src="images/logotype.png" alt="Attakkaya Logo" class="h-12"></a>
+        
+        <div class="hidden md:flex items-center space-x-8 font-medium text-sm">
+            <a href="#intro" class="hover:text-blue-600 transition">ការណែនាំ</a>
+            <a href="#how-to" class="hover:text-blue-600 transition">វិធីសាស្រ្តវាយបញ្ចូល</a>
+            <a href="#pc-version" class="hover:text-blue-600 transition">កំណែ PC</a>
+            <a href="#demo" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition flex items-center justify-center leading-none">
+                សាកល្បងឥឡូវនេះ
+            </a>
+        </div>
+    </div>
+</nav>
 
-const oSeries = new Set(['ក','គ','ង','ច','ជ','ញ','ដ','ឌ','ណ','ត','ទ','ន','ប','ព','ម','យ','រ','ល','វ','អ','ស']);
-// 콧소리(5열) 자음 — 넥스트/오넥스트 없음
-const nasalConsonants = new Set(['ម','ង','ញ','ន']);
+<section id="intro" class="py-20 bg-white text-center px-6">
+    <div class="max-w-4xl mx-auto">
+        <p class="text-blue-600 font-bold mb-4 md:text-3xl tracking-tight">បដិវត្តន៍ក្តារចុចភាសាខ្មែរ</p>
+        <h1 class="text-4xl md:text-7xl font-black mb-6 md:leading-[1.2] text-gray-800">
+        <span class="text-blue-600">កក្តារចុចប៊ូតុងធំ ៨ជួរ - សបយក</span>
+</h1>
+        <div class="mt-12">
+            <img src="images/mobile.png" alt="សបយក" class="mx-auto w-full max-w-xl drop-shadow-2xl rounded-xl">
+        </div>
+    </div>
+</section>
 
-const leftKeys = [
-  ['ដ','ម','រ','ង'],
-  ['ស','ប','យ','ក'],
-  ['ញ','ច','ត','ន'],
-];
+    <section id="how-to" class="py-20 max-w-6xl mx-auto px-6 border-t border-gray-100">
+        <div class="flex flex-col md:flex-row items-center gap-12">
+            <div class="md:w-1/2">
+                <img src="images/how2step.png" alt="ဗျည်းရိုက်နှိပ်ပုံစံ" class="w-full rounded-xl border border-gray-100 shadow-sm">
+            </div>
+            <div class="md:w-1/2">
+                <h3 class="text-2xl font-bold mb-6 text-gray-800">ការវាយព្យញ្ជនៈ: A/O Next Key</h3>
+                <ul class="space-y-4 text-gray-600">
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-3 mt-1">✓</span>
+                        <span>ព្យញ្ជនៈជួរទី២ដល់ទី៤នៅក្នុងតារាងព្យញ្ជនៈ អាចវាយបញ្ចូលបានដោយ<strong>ចុចប៊ូតុងមូលដ្ឋាន រួចប្តូរដោយប៊ូតុង Next</strong>។</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-3 mt-1">✓</span>
+                        <span>សបយក នៅលើ PC ផងដែរ!</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
 
-const rightKeys = [
-  [
-    { type:'vowel', chars:['់','៉','៌','៍'] },
-    { type:'vowel', chars:['ិ','ី','ឹ','ឺ'] },
-    { type:'vowel', chars:['ំ','៊','៏','័'] },
-    { type:'vowel', chars:['៎','៑','៝'] },
-  ],
-  [
-    { type:'vowel', chars:['េ','ែ','ៃ'] },
-    { type:'onext' },
-    { type:'vowel', chars:['ា','ៅ','ៀ','ឿ'] },
-    { type:'vowel', chars:['ះ','ៈ'] },
-  ],
-  [
-    { type:'next' },
-    { type:'vowel', chars:['ុ','ូ','ួ'] },
-    { type:'vowel', chars:['។','៕'] },
-    { type:'bs' },
-  ],
-];
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row-reverse items-center gap-12">
+                <div class="md:w-1/2">
+                    <img src="images/how2vowel.png" alt="သရရိုက်နှိပ်ပုံစံ" class="w-full rounded-xl border border-gray-100 shadow-sm">
+                </div>
+                <div class="md:w-1/2">
+                    <h3 class="text-2xl font-bold mb-6 text-gray-800">ប៊ូតុងសញ្ញាត្រូវបានដាក់តាមទិសដៅភ្ជាប់។ គិតតែថានៅជ្រុងណានៃព្យញ្ជនៈ។</h3>
+                    <ul class="space-y-4 text-gray-600">
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-3 mt-1">✓</span>
+                            <span>យក <strong>ប៊ូតុង O▸ នៅកណ្តាល</strong> ជាមូលដ្ឋាន សញ្ញាដែលភ្ជាប់ខាងលើ ចុចពីខាងលើ សញ្ញាដែលភ្ជាប់ខាងក្រោម ចុចពីខាងក្រោម <strong>ប៉ុណ្ណោះ។</strong></span>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
 
-const popupRight = [
-  [
-    { type:'char', chars:['ឪ','ឳ'] },
-    { type:'char', chars:['ឧ','ឩ'] },
-    { type:'char', chars:['ឭ','ឮ','ឰ'] },
-    { type:'char', chars:['ឱ','ឲ','ឨ'] },
-  ],
-  [
-    { type:'char', chars:['ឥ','ឦ'] },
-    { type:'char', chars:['ឯ'] },
-    { type:'char', chars:['ឫ','ឬ'] },
-    { type:'char', chars:['៙','៚'] },
-  ],
-  [
-    { type:'char', chars:['៖'] },
-    { type:'char', chars:['ៗ'] },
-    { type:'char', chars:['៘','ៜ'] },
-    { type:'bs' },
-  ],
-];
+    <section class="py-20 max-w-6xl mx-auto px-6">
+        <div class="flex flex-col md:flex-row items-center gap-12">
+            <div class="md:w-1/2">
+                <img src="images/how2plus.png" alt="အထူးရိုက်နှိပ်ပုံစံ" class="w-full rounded-xl border border-gray-100 shadow-sm">
+            </div>
+            <div class="md:w-1/2">
+                <h3 class="text-2xl font-bold mb-6 text-gray-800">ព្យញ្ជនៈជាន់, ស្រៈឯករាជ្យ និងសញ្ញាពិសេសៗ</h3>
+                <p class="text-gray-600 mb-6 font-medium">លើកលែងតែព្យញ្ជនៈ និងស្រៈមូលដ្ឋាន ប៊ូតុងដែលនៅសល់ត្រូវបានប្រមូលផ្តុំនៅប៊ូតុង Space។</p>
+                <div class="bg-blue-50 p-6 rounded-xl inline-block">
+                    <p class="text-blue-700 font-bold text-lg">ចុច Space ១ដង = ជង់ព្យញ្ជនៈ, ចុច Space ២ដង = ស្រៈឯករាជ្យ និងសញ្ញាពិសេស។</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-// ── 헬퍼 ──────────────────────────────────────
-function getRoot(char) {
-  for (const [root, arr] of Object.entries(consonantRows)) {
-    if (arr.includes(char)) return root;
-  }
-  return null;
-}
+    <section id="pc-version" class="py-20 bg-gray-900 text-white">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-6">នៅលើ PC ក៏មាន សបយក ដែរ!</h2>
+            <p class="text-gray-400 mb-10 max-w-2xl mx-auto">
+                ដោយសារ សបយក អាចវាយដោយមិនមើលបានក្នុងរយៈពេលតែមួយថ្ងៃ អ្នកអាចវាយបញ្ចូលបានយ៉ាងងាយស្រួលនៅលើក្តារចុចដែលមានស្រាប់ផងដែរ។
+            </p>
+            <img src="images/pc1day.png" alt="PC ဗားရှင်း အသုံးပြုပုံ" class="mx-auto w-full max-w-2xl h-auto mb-10 rounded-lg shadow-2xl">
+        </div>
+    </section>
 
-function calcNextIdx(root, curIdx) {
-  const arr = consonantRows[root];
-  if (!arr) return null;
-  // ដ행 특수: 인덱스1 → 인덱스4(ណ) 점프
-  if (root === 'ដ') {
-    if (curIdx === 0) return 1;
-    if (curIdx === 1) return 4;
-    return null;
-  }
-  // 일반: 콧소리(인덱스4) 제외, 인덱스3까지
-  const limit = arr.length === 5 ? 3 : arr.length - 1;
-  const next = curIdx + 1;
-  return next <= limit ? next : null;
-}
-
-function calcONextIdx(root, curIdx) {
-  const arr = consonantRows[root];
-  if (!arr || arr.length < 3) return null;
-  if (curIdx < 2) return 2;
-  const next = curIdx + 1;
-  return next < arr.length ? next : 2;
-}
-
-// ── State ──────────────────────────────────────
-let state = {
-  activeRoot: null,
-  activeCharIdx: 0,
-  lastVowelKey: null,
-  vowelTapIdx: 0,
-  stackMode: false,
-  popupLastKey: null,
-  popupTapIdx: 0,
-  popupCharEntered: false, // 팝업에서 문자 입력됐는지
-};
-
-const editor = document.getElementById('editor');
-
-function getText() { return editor.dataset.text || ''; }
-function setText(t) {
-  editor.dataset.text = t;
-  // innerHTML로 렌더: 텍스트 그대로 + 커서 span
-  const escaped = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  editor.innerHTML = escaped + '<span class="cursor">|</span>';
-}
-function appendText(c) { setText(getText() + c); }
-
-function backspace() {
-  const t = getText();
-  if (!t.length) return;
-  if (t.length >= 2 && t.charCodeAt(t.length - 2) === 0x17D2) {
-    setText(t.slice(0, -2));
-  } else {
-    setText(t.slice(0, -1));
-  }
-}
-
-function replaceLastConsonant(newChar) {
-  const t = getText();
-  if (!t.length) return;
-  // ្+자음 쌍이면 자음만 교체
-  if (t.length >= 2 && t.charCodeAt(t.length - 2) === 0x17D2) {
-    setText(t.slice(0, -1) + newChar);
-  } else {
-    setText(t.slice(0, -1) + newChar);
-  }
-}
-
-// ── 핸들러 ──────────────────────────────────────
-function handleConsonant(char) {
-  const root = getRoot(char);
-  if (state.stackMode) {
-    // ្ 는 이미 입력창에 있음, 자음만 추가
-    appendText(char);
-    state.stackMode = false;
-  } else {
-    appendText(char);
-  }
-  state.activeRoot = nasalConsonants.has(char) ? null : root;
-  state.activeCharIdx = (root && !nasalConsonants.has(char)) ? consonantRows[root].indexOf(char) : 0;
-  state.lastVowelKey = null;
-  state.vowelTapIdx = 0;
-  render();
-}
-
-function handleNext() {
-  if (!state.activeRoot) return;
-  const nextIdx = calcNextIdx(state.activeRoot, state.activeCharIdx);
-  if (nextIdx === null) return;
-  const newChar = consonantRows[state.activeRoot][nextIdx];
-  if (!newChar) return;
-  replaceLastConsonant(newChar);
-  state.activeCharIdx = nextIdx;
-  state.lastVowelKey = null;
-  state.vowelTapIdx = 0;
-  render();
-}
-
-function handleONext() {
-  if (!state.activeRoot) return;
-  const nextIdx = calcONextIdx(state.activeRoot, state.activeCharIdx);
-  if (nextIdx === null) return;
-  const newChar = consonantRows[state.activeRoot][nextIdx];
-  if (!newChar) return;
-  replaceLastConsonant(newChar);
-  state.activeCharIdx = nextIdx;
-  state.lastVowelKey = null;
-  state.vowelTapIdx = 0;
-  render();
-}
-
-function handleVowel(keyId, chars) {
-  if (state.lastVowelKey === keyId) {
-    state.vowelTapIdx = (state.vowelTapIdx + 1) % chars.length;
-    const t = getText();
-    setText(t.slice(0, -1) + chars[state.vowelTapIdx]);
-  } else {
-    state.lastVowelKey = keyId;
-    state.vowelTapIdx = 0;
-    appendText(chars[0]);
-  }
-  state.activeRoot = null;
-  state.activeCharIdx = 0;
-  render();
-}
-
-function handleSpace() {
-  if (state.stackMode) {
-    // 2탭: ្ 제거 후 팝업
-    const t = getText();
-    if (t.endsWith('\u17D2')) setText(t.slice(0, -1));
-    state.stackMode = false;
-    openPopup();
-    return;
-  }
-  if (state.activeRoot) {
-    // 1탭: ្ 미리 표시
-    appendText('\u17D2');
-    state.stackMode = true;
-  } else {
-    openPopup();
-  }
-  state.lastVowelKey = null;
-  state.vowelTapIdx = 0;
-  render();
-}
-
-function handleBS() {
-  backspace();
-  state.lastVowelKey = null;
-  state.vowelTapIdx = 0;
-  const t = getText();
-  const last = t.length ? t[t.length - 1] : null;
-  const root = last ? getRoot(last) : null;
-  state.activeRoot = root;
-  state.activeCharIdx = root ? consonantRows[root].indexOf(last) : 0;
-  state.stackMode = false;
-  
-  render();
-}
-
-// ── 팝업 ──────────────────────────────────────
-function openPopup() {
-  state.popupLastKey = null;
-  state.popupTapIdx = 0;
-  state.popupCharEntered = false;
-  renderPopup();
-
-  const wrap = document.getElementById('phone-wrap');
-  const w = wrap.clientWidth;
-
-  // 팝업 내부 키 크기 자동 계산
-  const keyW = (w - 10 - 7 * 4) / 8;
-  const keyH = Math.min(keyW * 1.3, 56);
-  const fontSize = Math.min(keyW * 0.35, 18);
-  
-  let dynStyle = document.getElementById('popup-dynamic-style');
-  if (!dynStyle) { 
-    dynStyle = document.createElement('style'); 
-    dynStyle.id = 'popup-dynamic-style'; 
-    document.head.appendChild(dynStyle); 
-  }
-  dynStyle.textContent = `
-    #popup-keyboard .key { height: ${keyH}px !important; font-size: ${fontSize}px !important; }
-    #popup-keyboard .key-space, #popup-keyboard .key-123, #popup-keyboard .key-enter { height: ${keyH * 0.9}px !important; font-size: ${fontSize * 0.9}px !important; }
-    #popup-keyboard .kbd-grid { gap: 4px !important; }
-  `;
-
-  // 복잡한 위치 계산 로직을 모두 제거했습니다.
-  const overlay = document.getElementById('popup-overlay');
-  overlay.classList.add('show');
-}
-function closePopup() {
-  const overlay = document.getElementById('popup-overlay');
-  overlay.classList.remove('show');
-  overlay.style.display = 'none';
-  // 다음 openPopup을 위해 display 인라인 스타일 제거 예약
-  setTimeout(() => { overlay.style.display = ''; }, 50);
-}
-function handlePopupChar(keyId, chars) {
-  if (state.popupLastKey === keyId) {
-    state.popupTapIdx = (state.popupTapIdx + 1) % chars.length;
-    const t = getText();
-    setText(t.slice(0, -1) + chars[state.popupTapIdx]);
-  } else {
-    state.popupLastKey = keyId;
-    state.popupTapIdx = 0;
-    appendText(chars[0]);
-  }
-  if (!state.popupCharEntered) {
-    state.popupCharEntered = true;
-    renderPopup(); // 좌측 user → 자음키로 교체
-  }
-}
-function handlePopupBS() {
-  backspace();
-  state.popupLastKey = null;
-  state.popupTapIdx = 0;
-}
-function handlePopupSpace() {
-  state.popupLastKey = null;
-  state.popupTapIdx = 0;
-}
-
-// ── 렌더링 ──────────────────────────────────────
-function makeKey(cls, content, onClick) {
-  const d = document.createElement('div');
-  d.className = 'key ' + cls;
-  if (typeof content === 'string') {
-    d.textContent = content;
-  } else {
-    d.appendChild(content);
-  }
-  if (onClick) d.addEventListener('pointerdown', (e) => { e.preventDefault(); onClick(); });
-  return d;
-}
-
-function makeVowelKey(cls, chars, keyId, handler) {
-  const d = document.createElement('div');
-  d.className = 'key ' + cls;
-
-  function renderChar(c) {
-    const cp = c.codePointAt(0);
-    const isDiacritic = (cp >= 0x17B6 && cp <= 0x17D3) || cp === 0x17C7 || cp === 0x17C8;
-    if (isDiacritic) return '\u200D' + c;
-    return c;
-  }
-  if (chars.length === 1) {
-    d.innerHTML = renderChar(chars[0]);
-  } else {
-    const ml = document.createElement('div');
-    ml.className = 'multi-label';
-    chars.forEach(c => {
-      const s = document.createElement('span');
-      s.innerHTML = renderChar(c);
-      ml.appendChild(s);
-    });
-    d.appendChild(ml);
-  }
-  d.addEventListener('pointerdown', (e) => { e.preventDefault(); handler(keyId, chars); });
-  return d;
-}
-
-// 이미지 기준 키 위치 (%) - 1974x1044 기준
-const KEY_COLS = [1.05, 13.50, 25.90, 38.30, 50.65, 63.15, 75.55, 88.05];
-const KEY_ROWS = [3.03, 28.50, 51.80];
-const KEY_W = 10.80, KEY_H = 20.00;
-const BOT_Y = 76.97, BOT_H = 19.91;
-
-function makeOverlayBtn(cls, style, onClick) {
-  const b = document.createElement('button');
-  b.className = 'kbd-btn ' + cls;
-  Object.assign(b.style, style);
-  if (onClick) b.addEventListener('pointerdown', (e) => { e.preventDefault(); onClick(); });
-  return b;
-}
-
-function render() {
-  const kbd = document.getElementById('kbd');
-  kbd.innerHTML = '';
-
-  for (let row = 0; row < 3; row++) {
-    // 좌측 4열: 자음
-    for (let col = 0; col < 4; col++) {
-      const char = leftKeys[row][col];
-      const isO = oSeries.has(char);
-      const b = makeOverlayBtn('kbd-consonant' + (isO ? ' o-series' : ''), {
-        left: KEY_COLS[col] + '%', top: KEY_ROWS[row] + '%',
-        width: KEY_W + '%', height: KEY_H + '%'
-      }, () => handleConsonant(char));
-      b.textContent = char;
-      kbd.appendChild(b);
-    }
-
-    // 우측 4열
-    for (let col = 0; col < 4; col++) {
-      const rk = rightKeys[row][col];
-      const imgCol = col + 4;
-      const style = { left: KEY_COLS[imgCol] + '%', top: KEY_ROWS[row] + '%', width: KEY_W + '%', height: KEY_H + '%' };
-
-      if (rk.type === 'next') {
-        let chars = [];
-        if (state.activeRoot) {
-          const arr = consonantRows[state.activeRoot];
-          const curChar = arr[state.activeCharIdx];
-          const isRo = (curChar === 'រ');
-          if (isRo) { chars = arr.slice(2, 4).filter(Boolean); }
-          else if (state.activeCharIdx === 0) {
-            if (state.activeRoot === 'ដ') chars = [arr[1], arr[4]];
-            else if (state.activeRoot === 'ស') chars = [arr[1], arr[2], arr[3]];
-            else if (arr[1]) chars = [arr[1]];
-          } else {
-            const nextIdx = calcNextIdx(state.activeRoot, state.activeCharIdx);
-            if (nextIdx !== null) chars = [arr[nextIdx]];
-          }
-        }
-        const b = makeOverlayBtn('kbd-next', style, () => handleNext());
-        b.textContent = chars.length > 0 ? chars.join(' ') : 'A▸';
-        kbd.appendChild(b);
-
-      } else if (rk.type === 'onext') {
-        let chars = [];
-        if (state.activeRoot) {
-          const arr = consonantRows[state.activeRoot];
-          const curChar = arr[state.activeCharIdx];
-          const isRo = (curChar === 'រ');
-          if (isRo) { chars = arr.slice(2, 4).filter(Boolean); }
-          else if (state.activeCharIdx === 0) { chars = arr.slice(2, 4).filter(Boolean); }
-          else if (state.activeCharIdx >= 2) {
-            const nextIdx = calcONextIdx(state.activeRoot, state.activeCharIdx);
-            if (nextIdx !== null) chars = [arr[nextIdx]];
-          }
-        }
-        const b = makeOverlayBtn('kbd-onext', style, () => handleONext());
-        b.textContent = chars.length > 0 ? chars.join(' ') : 'O‣';
-        kbd.appendChild(b);
-
-      } else if (rk.type === 'bs') {
-        kbd.appendChild(makeOverlayBtn('kbd-func', style, handleBS));
-
-      } else if (rk.type === 'vowel') {
-        kbd.appendChild(makeOverlayBtn('kbd-vowel', style, () => handleVowel(`r${row}c${col}`, rk.chars)));
-      }
-    }
-  }
-
-  // 바텀바: 123
-  kbd.appendChild(makeOverlayBtn('kbd-123', {
-    left: '1.05%', top: BOT_Y + '%', width: '23.50%', height: BOT_H + '%'
-  }, null));
-
-  // 스페이스
-  const sp = makeOverlayBtn('kbd-space' + (state.stackMode ? ' stack-active' : ''), {
-    left: '25.95%', top: BOT_Y + '%', width: '48.75%', height: BOT_H + '%'
-  }, () => handleSpace());
-  kbd.appendChild(sp);
-
-  // 스페이스 라벨
-  const lbl = document.createElement('div');
-  lbl.className = 'kbd-space-label';
-  lbl.style.cssText = `left:25.95%;top:${BOT_Y}%;width:48.75%;height:${BOT_H}%;`;
-  lbl.textContent = '្ ឥ/ៗ';
-  kbd.appendChild(lbl);
-
-  // 엔터
-  kbd.appendChild(makeOverlayBtn('kbd-enter', {
-    left: '75.55%', top: BOT_Y + '%', width: '23.30%', height: BOT_H + '%'
-  }, () => { appendText('\n'); render(); }));
-}
-
-function renderPopup() {
-  const pkbd = document.getElementById('popup-kbd');
-  pkbd.innerHTML = '';
-  for (let row = 0; row < 3; row++) {
-    // 좌측 4키: 문자 입력 전엔 user, 후엔 자음키
-    for (let col = 0; col < 4; col++) {
-      let k;
-      if (state.popupCharEntered) {
-        const char = leftKeys[row][col];
-        const isO = oSeries.has(char);
-        k = makeKey('key-consonant' + (isO ? ' o-series' : ''), char, () => {
-          handleConsonant(char);
-          closePopup();
-        });
-      } else {
-        k = makeKey('key-user', 'user', () => {
-          appendText('វាក្យស្ព័ន្ធនេះត្រូវបានចុះឈ្មោះដោយអ្នកប្រើប្រាស់។');
-          closePopup();
-        });
-      }
-      pkbd.appendChild(k);
-    }
-    for (let col = 0; col < 4; col++) {
-      const rk = popupRight[row][col];
-      let k;
-      if (rk.type === 'bs')   k = makeKey('key-func', '⌫', handlePopupBS);
-      else if (rk.type === 'char') k = makeVowelKey('key-popup-char', rk.chars, `p${row}c${col}`, handlePopupChar);
-      if (k) pkbd.appendChild(k);
-    }
-  }
-  const bb = document.createElement('div');
-  bb.className = 'bottom-bar';
-  const k123 = document.createElement('div'); k123.className = 'key-123'; k123.textContent = '123'; bb.appendChild(k123);
-  const kSp = document.createElement('div'); kSp.className = 'key-space'; kSp.textContent = '→';
-  kSp.addEventListener('pointerdown', (e) => { e.preventDefault(); handlePopupSpace(); });
-  bb.appendChild(kSp);
-  const kCl = document.createElement('div'); kCl.className = 'key-enter'; kCl.textContent = '✕';
-  kCl.style.background = '#ef4444';
-  kCl.addEventListener('pointerdown', (e) => { e.preventDefault(); closePopup(); });
-  bb.appendChild(kCl);
-  pkbd.appendChild(bb);
-}
-
-document.getElementById('popup-overlay').addEventListener('pointerdown', function(e) {
-  if (e.target === this) closePopup();
-});
-
-function resetAll() {
-  setText('');  state = { activeRoot:null, activeCharIdx:0, lastVowelKey:null, vowelTapIdx:0, stackMode:false, popupLastKey:null, popupTapIdx:0, popupCharEntered:false };
-  
-  closePopup();
-  render();
-}
+<section id="demo" class="py-24 text-center">
+    <h2 class="text-3xl font-bold mb-16">សាកល្បង សបយក ដោយខ្លួនឯង</h2>
+    <div class="grid md:grid-cols-2 gap-10 max-w-4xl mx-auto px-6">
+        <div class="p-10 rounded-3xl bg-white border border-gray-100 shadow-xl flex flex-col items-center">
+            <h4 class="text-xl font-bold mb-6 text-gray-800">Mobile សបយក</h4>
+            <div class="h-32 flex items-center mb-8">
+                <img src="images/mobile.png" alt="မိုဘိုင်း စမ်းသပ်ခြင်း" class="max-h-full w-auto object-contain grayscale hover:grayscale-0 transition duration-500">
+            </div>
+            <a href="mobile_demo.html" class="inline-block w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-blue-600 transition text-center">សាកល្បងប្រើ</a>
+        </div>
+        
+        <div class="p-10 rounded-3xl bg-white border border-gray-100 shadow-xl flex flex-col items-center">
+            <h4 class="text-xl font-bold mb-6 text-gray-800">PC សបយក</h4>
+            <div class="h-32 flex items-center mb-8">
+                <img src="images/pc.png" alt="PC တပ်ဆင်ခြင်း" class="max-h-full w-auto object-contain grayscale hover:grayscale-0 transition duration-500">
+            </div>
+            <a href="try.html" class="inline-block w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-blue-600 transition text-center">កំពុងរៀបចំ</a>
+        </div>
+    </div>
+</section>
 
 
-// 키보드 이미지 설정
-document.getElementById('kbd-image').src = 'keyboard.png';
-setText('');
-render();
-</script>
+    <footer class="py-12 border-t border-gray-100 text-center text-gray-400 text-sm">
+        <p>© 2026 Sabaykey All rights reserved.</p>
+    </footer>
+
 </body>
 </html>
