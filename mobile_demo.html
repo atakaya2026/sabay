@@ -83,6 +83,9 @@
   /* 다음키 버튼 (노란 키 위에 텍스트 표시) */
   .kbd-next { font-size: clamp(10px, 3.5vw, 17px); color: #78350f; font-weight: 900; }
   .kbd-onext { font-size: clamp(10px, 3.5vw, 17px); color: #78350f; font-weight: 900; }
+  /* 스택/팝업 키 */
+  .kbd-stack { font-size: clamp(9px, 3vw, 14px); color: #78350f; font-weight: 900; }
+  .kbd-stack.stack-active { color: #d97706; }
   /* 투명 클릭 영역 (부호/BS/스페이스/엔터/123) */
   .kbd-vowel, .kbd-func, .kbd-space, .kbd-enter, .kbd-123 { font-size: 0; }
   /* 스페이스 텍스트 표시 */
@@ -127,6 +130,8 @@
   }
   .key-space:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
   .key-space.stack-active { background: #fef3c7; border: 2px solid #f59e0b; }
+  .kbd-space.zwsp-active { background: #fef3c7 !important; border: 2px solid #f59e0b !important; }
+  .kbd-space.dandaa-active { background: #dcfce7 !important; border: 2px solid #22c55e !important; }
   .key-123, .key-enter {
     background: #8e8e93; color: #fff; height: 11vw; border-radius: 6px;
     display: flex; justify-content: center; align-items: center;
@@ -246,8 +251,8 @@ const rightKeys = [
   ],
   [
     { type:'next' },
+    { type:'stack' },
     { type:'vowel', chars:['ុ','ូ','ួ'] },
-    { type:'vowel', chars:['។','៕'] },
     { type:'bs' },
   ],
 ];
@@ -266,7 +271,7 @@ const popupRight = [
     { type:'char', chars:['៙','៚'] },
   ],
   [
-    { type:'char', chars:['៖'] },
+    { type:'char', chars:['៕','៖'] },
     { type:'char', chars:['ៗ'] },
     { type:'char', chars:['៘','ៜ'] },
     { type:'bs' },
@@ -311,6 +316,7 @@ let state = {
   lastVowelKey: null,
   vowelTapIdx: 0,
   stackMode: false,
+  spaceMode: 0, // 0=기본, 1=ZWSP입력됨, 2=।입력됨
   popupLastKey: null,
   popupTapIdx: 0,
   popupCharEntered: false, // 팝업에서 문자 입력됐는지
@@ -323,7 +329,8 @@ function setText(t) {
   editor.dataset.text = t;
   // innerHTML로 렌더: 텍스트 그대로 + 커서 span
   const escaped = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  editor.innerHTML = escaped + '<span class="cursor">|</span>';
+  const cursorChar = state.spaceMode === 1 ? '⁝' : '|';
+  editor.innerHTML = escaped + `<span class="cursor">${cursorChar}</span>`;
 }
 function appendText(c) { setText(getText() + c); }
 
@@ -351,6 +358,8 @@ function replaceLastConsonant(newChar) {
 // ── 핸들러 ──────────────────────────────────────
 function handleConsonant(char) {
   const root = getRoot(char);
+  // 새 입력: ZWSP 상태면 커서 원위치
+  if (state.spaceMode !== 0) state.spaceMode = 0;
   if (state.stackMode) {
     // ្ 는 이미 입력창에 있음, 자음만 추가
     appendText(char);
@@ -366,6 +375,7 @@ function handleConsonant(char) {
 }
 
 function handleNext() {
+  if (state.spaceMode !== 0) state.spaceMode = 0;
   if (!state.activeRoot) return;
   const nextIdx = calcNextIdx(state.activeRoot, state.activeCharIdx);
   if (nextIdx === null) return;
@@ -379,6 +389,7 @@ function handleNext() {
 }
 
 function handleONext() {
+  if (state.spaceMode !== 0) state.spaceMode = 0;
   if (!state.activeRoot) return;
   const nextIdx = calcONextIdx(state.activeRoot, state.activeCharIdx);
   if (nextIdx === null) return;
@@ -392,6 +403,7 @@ function handleONext() {
 }
 
 function handleVowel(keyId, chars) {
+  if (state.spaceMode !== 0) state.spaceMode = 0;
   if (state.lastVowelKey === keyId) {
     state.vowelTapIdx = (state.vowelTapIdx + 1) % chars.length;
     const t = getText();
@@ -407,6 +419,48 @@ function handleVowel(keyId, chars) {
 }
 
 function handleSpace() {
+  const ZWSP = '\u200B';
+  const DANDAA = '។';
+
+  if (state.spaceMode === 1) {
+    // 2타: spaceMode 먼저 변경(커서 즉시 원위치), 그 다음 ZWSP→។ 교체
+    state.spaceMode = 2;
+    const t = getText();
+    if (t.endsWith(ZWSP)) setText(t.slice(0, -1) + DANDAA);
+    state.lastVowelKey = null;
+    state.vowelTapIdx = 0;
+    render();
+    return;
+  }
+  if (state.spaceMode === 2) {
+    // 3타: spaceMode 먼저 변경, 그 다음 ។→공백 교체
+    state.spaceMode = 3;
+    const t = getText();
+    if (t.endsWith(DANDAA)) setText(t.slice(0, -1) + ' ');
+    state.lastVowelKey = null;
+    state.vowelTapIdx = 0;
+    render();
+    return;
+  }
+  if (state.spaceMode === 3) {
+    // 4타~: 공백만 추가
+    appendText(' ');
+    state.lastVowelKey = null;
+    state.vowelTapIdx = 0;
+    render();
+    return;
+  }
+  // 기본(spaceMode=0): 1타 — spaceMode 먼저 1로 세팅 후 ZWSP 삽입
+  state.spaceMode = 1;
+  state.activeRoot = null;
+  state.activeCharIdx = 0;
+  state.lastVowelKey = null;
+  state.vowelTapIdx = 0;
+  appendText(ZWSP);
+  render();
+}
+
+function handleStack() {
   if (state.stackMode) {
     // 2탭: ្ 제거 후 팝업
     const t = getText();
@@ -427,7 +481,9 @@ function handleSpace() {
   render();
 }
 
+
 function handleBS() {
+  if (state.spaceMode !== 0) state.spaceMode = 0;
   backspace();
   state.lastVowelKey = null;
   state.vowelTapIdx = 0;
@@ -437,7 +493,6 @@ function handleBS() {
   state.activeRoot = root;
   state.activeCharIdx = root ? consonantRows[root].indexOf(last) : 0;
   state.stackMode = false;
-  
   render();
 }
 
@@ -620,6 +675,11 @@ function render() {
       } else if (rk.type === 'bs') {
         kbd.appendChild(makeOverlayBtn('kbd-func', style, handleBS));
 
+      } else if (rk.type === 'stack') {
+        const b = makeOverlayBtn('kbd-stack' + (state.stackMode ? ' stack-active' : ''), style, () => handleStack());
+        b.textContent = state.stackMode ? '្▸팝업' : '្ ឥ..';
+        kbd.appendChild(b);
+
       } else if (rk.type === 'vowel') {
         kbd.appendChild(makeOverlayBtn('kbd-vowel', style, () => handleVowel(`r${row}c${col}`, rk.chars)));
       }
@@ -632,7 +692,7 @@ function render() {
   }, null));
 
   // 스페이스
-  const sp = makeOverlayBtn('kbd-space' + (state.stackMode ? ' stack-active' : ''), {
+  const sp = makeOverlayBtn('kbd-space', {
     left: '25.95%', top: BOT_Y + '%', width: '48.75%', height: BOT_H + '%'
   }, () => handleSpace());
   kbd.appendChild(sp);
@@ -641,7 +701,7 @@ function render() {
   const lbl = document.createElement('div');
   lbl.className = 'kbd-space-label';
   lbl.style.cssText = `left:25.95%;top:${BOT_Y}%;width:48.75%;height:${BOT_H}%;`;
-  lbl.textContent = '្ ឥ..ៗ..';
+  lbl.textContent = '⁝ ។ ␣';
   kbd.appendChild(lbl);
 
   // 엔터
@@ -698,7 +758,7 @@ document.getElementById('popup-overlay').addEventListener('pointerdown', functio
 });
 
 function resetAll() {
-  setText('');  state = { activeRoot:null, activeCharIdx:0, lastVowelKey:null, vowelTapIdx:0, stackMode:false, popupLastKey:null, popupTapIdx:0, popupCharEntered:false };
+  setText('');  state = { activeRoot:null, activeCharIdx:0, lastVowelKey:null, vowelTapIdx:0, stackMode:false, spaceMode:0, popupLastKey:null, popupTapIdx:0, popupCharEntered:false };
   
   closePopup();
   render();
