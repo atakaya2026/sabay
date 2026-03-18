@@ -81,10 +81,10 @@
   .kbd-consonant { font-size: clamp(12px, 5.5vw, 26px); color: #1a1208; }
   .kbd-consonant.o-series { color: #1a5fb4; }
   /* 다음키 버튼 (노란 키 위에 텍스트 표시) */
-  .kbd-next { font-size: clamp(10px, 3.5vw, 17px); color: #78350f; font-weight: 900; }
-  .kbd-onext { font-size: clamp(10px, 3.5vw, 17px); color: #78350f; font-weight: 900; }
+  .kbd-next { font-size: clamp(14px, 4vw, 20px); color: #78350f; font-weight: 900; }
+  .kbd-onext { font-size: clamp(14px, 4vw, 20px); color: #78350f; font-weight: 900; }
   /* 스택/팝업 키 */
-  .kbd-stack { font-size: clamp(9px, 3vw, 14px); color: #78350f; font-weight: 900; }
+  .kbd-stack { font-size: clamp(18px, 4vw, 22px); color: #78350f; font-weight: 900; }
   .kbd-stack.stack-active { color: #d97706; }
   /* 투명 클릭 영역 (부호/BS/스페이스/엔터/123) */
   .kbd-vowel, .kbd-func, .kbd-space, .kbd-enter, .kbd-123 { font-size: 0; }
@@ -271,8 +271,8 @@ const popupRight = [
     { type:'char', chars:['៙','៚'] },
   ],
   [
-    { type:'char', chars:['៕','៖'] },
-    { type:'char', chars:['ៗ'] },
+    { type:'char', chars:['ៗ','៖'] },
+    { type:'char', chars:['។','៕'] },
     { type:'char', chars:['៘','ៜ'] },
     { type:'bs' },
   ],
@@ -420,37 +420,26 @@ function handleVowel(keyId, chars) {
 
 function handleSpace() {
   const ZWSP = '\u200B';
-  const DANDAA = '។';
 
   if (state.spaceMode === 1) {
-    // 2타: spaceMode 먼저 변경(커서 즉시 원위치), 그 다음 ZWSP→។ 교체
+    // 2타: ZWSP→공백 교체
     state.spaceMode = 2;
     const t = getText();
-    if (t.endsWith(ZWSP)) setText(t.slice(0, -1) + DANDAA);
+    if (t.endsWith(ZWSP)) setText(t.slice(0, -1) + ' ');
     state.lastVowelKey = null;
     state.vowelTapIdx = 0;
     render();
     return;
   }
-  if (state.spaceMode === 2) {
-    // 3타: spaceMode 먼저 변경, 그 다음 ។→공백 교체
-    state.spaceMode = 3;
-    const t = getText();
-    if (t.endsWith(DANDAA)) setText(t.slice(0, -1) + ' ');
-    state.lastVowelKey = null;
-    state.vowelTapIdx = 0;
-    render();
-    return;
-  }
-  if (state.spaceMode === 3) {
-    // 4타~: 공백만 추가
+  if (state.spaceMode >= 2) {
+    // 3타~: 공백 추가
     appendText(' ');
     state.lastVowelKey = null;
     state.vowelTapIdx = 0;
     render();
     return;
   }
-  // 기본(spaceMode=0): 1타 — spaceMode 먼저 1로 세팅 후 ZWSP 삽입
+  // 기본(spaceMode=0): 1타 — ZWSP 삽입
   state.spaceMode = 1;
   state.activeRoot = null;
   state.activeCharIdx = 0;
@@ -677,7 +666,7 @@ function render() {
 
       } else if (rk.type === 'stack') {
         const b = makeOverlayBtn('kbd-stack' + (state.stackMode ? ' stack-active' : ''), style, () => handleStack());
-        b.textContent = state.stackMode ? '្▸팝업' : '្ ឥ..';
+        b.textContent = state.stackMode ? 'ឥ' : '្ ឥ..';
         kbd.appendChild(b);
 
       } else if (rk.type === 'vowel') {
@@ -701,7 +690,7 @@ function render() {
   const lbl = document.createElement('div');
   lbl.className = 'kbd-space-label';
   lbl.style.cssText = `left:25.95%;top:${BOT_Y}%;width:48.75%;height:${BOT_H}%;`;
-  lbl.textContent = '⁝ ។ ␣';
+  lbl.textContent = '⁝ ␣';
   kbd.appendChild(lbl);
 
   // 엔터
