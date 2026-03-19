@@ -641,7 +641,7 @@ function render() {
           }
         }
         const b = makeOverlayBtn('kbd-next', style, () => handleNext());
-        b.textContent = chars.length > 0 ? chars.join(' ') : 'A▸';
+        b.textContent = chars.length > 0 ? chars.join('') : 'A▸';
         kbd.appendChild(b);
 
       } else if (rk.type === 'onext') {
@@ -658,7 +658,7 @@ function render() {
           }
         }
         const b = makeOverlayBtn('kbd-onext', style, () => handleONext());
-        b.textContent = chars.length > 0 ? chars.join(' ') : 'O‣';
+        b.textContent = chars.length > 0 ? chars.join('') : 'O‣';
         kbd.appendChild(b);
 
       } else if (rk.type === 'bs') {
