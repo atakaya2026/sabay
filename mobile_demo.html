@@ -462,13 +462,9 @@ function handleStack() {
     openPopup();
     return;
   }
-  if (state.activeRoot) {
-    // 1탭: ្ 미리 표시
-    appendText('\u17D2');
-    state.stackMode = true;
-  } else {
-    openPopup();
-  }
+  // 1탭: 항상 ្ 삽입 (activeRoot 유무 무관)
+  appendText('\u17D2');
+  state.stackMode = true;
   state.lastVowelKey = null;
   state.vowelTapIdx = 0;
   render();
