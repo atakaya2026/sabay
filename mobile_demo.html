@@ -113,6 +113,10 @@
   .key-consonant { background: #fff; color: #1a1208; }
   .key-consonant.o-series { color: #1a5fb4; }
   .key-consonant.first-col { background: #daeeff; }
+  /* 팝업 자음키: 기본 자판과 동일한 색상 강제 적용 */
+  #popup-keyboard .key-consonant { background: #fff !important; color: #1a1208 !important; }
+  #popup-keyboard .key-consonant.o-series { color: #1a5fb4 !important; }
+  #popup-keyboard .key-consonant.first-col { background: #daeeff !important; }
   .key-next { background: #fde68a; color: #78350f; font-size: clamp(7px, 2.5vw, 14px); font-weight: 900; }
   .key-onext { background: #fde68a; color: #78350f; font-size: clamp(7px, 2.5vw, 14px); font-weight: 900; }
   .key-vowel { background: #ffffff; color: #1a5228; font-size: clamp(7px, 2.8vw, 16px); }
@@ -506,8 +510,10 @@ function openPopup() {
     dynStyle.id = 'popup-dynamic-style'; 
     document.head.appendChild(dynStyle); 
   }
+  const consonantFontSize = Math.min(keyW * 0.55, 26);
   dynStyle.textContent = `
     #popup-keyboard .key { height: ${keyH}px !important; font-size: ${fontSize}px !important; }
+    #popup-keyboard .key-consonant { font-size: ${consonantFontSize}px !important; }
     #popup-keyboard .key-space, #popup-keyboard .key-123, #popup-keyboard .key-enter { height: ${keyH * 0.9}px !important; font-size: ${fontSize * 0.9}px !important; }
     #popup-keyboard .kbd-grid { gap: 4px !important; }
   `;
@@ -709,7 +715,8 @@ function renderPopup() {
       if (state.popupCharEntered) {
         const char = leftKeys[row][col];
         const isO = oSeries.has(char);
-        k = makeKey('key-consonant' + (isO ? ' o-series' : ''), char, () => {
+        const isBlue = (row === 0 && col === 0) || (row === 1) || (row === 2 && (col === 1 || col === 2));
+        k = makeKey('key-consonant' + (isO ? ' o-series' : '') + (isBlue ? ' first-col' : ''), char, () => {
           handleConsonant(char);
           closePopup();
         });
