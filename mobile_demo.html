@@ -84,7 +84,7 @@
   .kbd-next { font-size: clamp(14px, 4vw, 20px); color: #78350f; font-weight: 900; }
   .kbd-onext { font-size: clamp(14px, 4vw, 20px); color: #78350f; font-weight: 900; }
   /* 스택/팝업 키 */
-  .kbd-stack { font-size: clamp(18px, 4vw, 22px); color: #78350f; font-weight: 900; }
+  .kbd-stack { font-size: clamp(18px, 4vw, 24px); color: #78350f; font-weight: 900; }
   .kbd-stack.stack-active { color: #d97706; }
   /* 투명 클릭 영역 (부호/BS/스페이스/엔터/123) */
   .kbd-vowel, .kbd-func, .kbd-space, .kbd-enter, .kbd-123 { font-size: 0; }
@@ -668,7 +668,7 @@ function render() {
 
       } else if (rk.type === 'stack') {
         const b = makeOverlayBtn('kbd-stack' + (state.stackMode ? ' stack-active' : ''), style, () => handleStack());
-        b.textContent = state.stackMode ? 'ឥ' : '្ ឥ..';
+        b.textContent = state.stackMode ? 'ឥ..' : '្​ឥ..';
         kbd.appendChild(b);
 
       } else if (rk.type === 'vowel') {
