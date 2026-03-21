@@ -1,26 +1,15 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="km">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>บัวคี</title>
+    <title>សបយក</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="images/logo.png" type="image/png">
-<style>
-    /* 태국어에 최적화된 Sarabun 폰트를 불러옵니다 */
-    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
-    
-    body { 
-        font-family: 'Sarabun', sans-serif; 
-        word-break: keep-all; 
-		line-break: loose;
-		overflow-x: hidden; /* 가로 스크롤 방지 */
-    }
-	span, p, h3 {
-    word-break: break-word; /* 단어 단위가 아니더라도 폭에 맞춰 줄바꿈 */
-    overflow-wrap: break-word;
-}
-</style>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+        body { font-family: 'Noto Sans KR', sans-serif; word-break: keep-all; }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-900 leading-relaxed">
 
@@ -29,11 +18,11 @@
         <a href="#"><img src="images/logotype.png" alt="Attakkaya Logo" class="h-12"></a>
         
         <div class="hidden md:flex items-center space-x-8 font-medium text-sm">
-            <a href="#intro" class="hover:text-blue-600 transition">คำแนะนำ</a>
-            <a href="#how-to" class="hover:text-blue-600 transition">วิธีใช้งาน</a>
-            <a href="#pc-version" class="hover:text-blue-600 transition">เวอร์ชัน PC</a>
+            <a href="#intro" class="hover:text-blue-600 transition">ការណែនាំ</a>
+            <a href="#how-to" class="hover:text-blue-600 transition">វិធីសាស្រ្តវាយបញ្ចូល</a>
+            <a href="#pc-version" class="hover:text-blue-600 transition">កំណែ PC</a>
             <a href="#demo" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition flex items-center justify-center leading-none">
-                ทดลองใช้เลย
+                សាកល្បងឥឡូវនេះ
             </a>
         </div>
     </div>
@@ -41,13 +30,11 @@
 
 <section id="intro" class="py-20 bg-white text-center px-6">
     <div class="max-w-4xl mx-auto">
-        <p class="text-blue-600 font-bold mb-4 text-3xl md:text-5xl tracking-tighter">
-    <span class="inline-block">ประกาศอิสรภาพ</span>
-    <br class="md:hidden"> <span class="inline-block">แห่งคีย์บอร์ดไทย</span>
-</p>
-        <h1 class="text-8xl md:text-[100px] font-black mb-2 md:leading-[1.2] text-gray-800">
-			<span class="text-blue-600">บัวคี</span>
-		</h1>
+        <p class="text-blue-600 font-bold mb-4 md:text-3xl tracking-tight">បដិវត្តន៍ក្តារចុចភាសាខ្មែរ</p>
+        <h1 class="text-4xl md:text-6xl font-black mb-2 md:leading-[1.2] text-gray-800">
+  <span class="text-blue-600">ក្តារចុចប៊ូតុងធំ ៨ជួរ - សបយក</span>
+</h1>
+<p class="text-2xl md:text-3xl font-bold text-blue-400 mb-6">Sabay Key</p>
         <div class="mt-12">
             <img src="images/mobile.png" alt="សបយក" class="mx-auto w-full max-w-xl drop-shadow-2xl rounded-xl">
         </div>
@@ -60,13 +47,16 @@
                 <img src="images/how2step.png" alt="ဗျည်းရိုက်နှိပ်ပုံစံ" class="w-full rounded-xl border border-gray-100 shadow-sm">
             </div>
             <div class="md:w-1/2">
-                <h3 class="text-2xl font-bold mb-6 text-gray-800">วิธีการพิมพ์พยัญชนะ: กดตัวพื้นฐานแล้วเติมขีด</h3>
+                <h3 class="text-2xl font-bold mb-6 text-gray-800">ការវាយព្យញ្ជនៈ: A/O Next Key</h3>
                 <ul class="space-y-4 text-gray-600">
                     <li class="flex items-start">
                         <span class="text-blue-500 mr-3 mt-1">✓</span>
-                        <span>เพียงกดพยัญชนะที่เป็นรูปแบบพื้นฐาน แล้วเติมขีดเพื่อเปลี่ยนเป็นตัวที่ต้องการ</span>
-
-					</li>
+                        <span>ព្យញ្ជនៈជួរទី២ដល់ទី៤នៅក្នុងតារាងព្យញ្ជនៈ អាចវាយបញ្ចូលបានដោយ<strong>ចុចប៊ូតុងមូលដ្ឋាន រួចប្តូរដោយប៊ូតុង Next</strong>។</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-3 mt-1">✓</span>
+                        <span>សបយក នៅលើ PC ផងដែរ!</span>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -79,57 +69,89 @@
                     <img src="images/how2vowel.png" alt="သရရိုက်နှိပ်ပုံစံ" class="w-full rounded-xl border border-gray-100 shadow-sm">
                 </div>
                 <div class="md:w-1/2">
-				<h3 class="text-2xl font-bold mb-4 text-gray-800 break-words">
-					สระและเครื่องหมายต่าง ๆ จัดวางตามทิศทางการประสมกับพยัญชนะ
-				</h3>
-
-				<ul class="space-y-4 text-gray-600">
-					<li class="flex items-start">
-						<span class="text-blue-500 mr-3 mt-1">✓</span>
-						<span class="break-words text-lg">สระที่อยู่ด้านบนจะวางไว้แถวบน, ด้านล่างวางไว้แถวล่าง, ด้านซ้ายวางไว้ทางซ้าย และด้านขวาวางไว้ทางขวา</span>
-					</li>
-				</ul>
+                    <h3 class="text-2xl font-bold mb-6 text-gray-800">ប៊ូតុងសញ្ញាត្រូវបានដាក់តាមទិសដៅភ្ជាប់។ គិតតែថានៅជ្រុងណានៃព្យញ្ជនៈ។</h3>
+                    <ul class="space-y-4 text-gray-600">
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-3 mt-1">✓</span>
+                            <span>យក <strong>ប៊ូតុង O▸ នៅកណ្តាល</strong> ជាមូលដ្ឋាន សញ្ញាដែលភ្ជាប់ខាងលើ ចុចពីខាងលើ សញ្ញាដែលភ្ជាប់ខាងក្រោម ចុចពីខាងក្រោម <strong>ប៉ុណ្ណោះ។</strong></span>
+                    </ul>
                 </div>
             </div>
         </div>
     </section>
 
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <img src="images/sabayspace.png" alt="သရရိုက်နှိပ်ပုံစံ" class="w-full rounded-xl border border-gray-100 shadow-sm">
+                </div>
+                <div class="md:w-1/2">
+                    <h3 class="text-2xl font-bold mb-6 text-gray-800">លាហើយការចុះបន្ទាត់ដែលមិនចង់បាន! - សប្បាយស្ពេស</h3>
+                    <ul class="space-y-4 text-gray-600">
+                        <li class="flex items-start">
+                        <span class="text-blue-500 mr-3 mt-1">✓</span>
+                        <span>ពចុច ១ដង (⁝) - បញ្ចូល<strong>សញ្ញាស្ពេសអរូប</strong> យ៉ាងងាយស្រួល</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-3 mt-1">✓</span>
+                        <span>ចុច ២ដងឡើងទៅ (␣) - បញ្ចូលសញ្ញាដកឃ្លាធម្មតា</span>
+                    </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <section class="py-20 max-w-6xl mx-auto px-6">
+        <div class="flex flex-col md:flex-row-reverse items-center gap-12">
+            <div class="md:w-1/2">
+                <img src="images/how2plus.png" alt="အထူးရိုက်နှိပ်ပုံစံ" class="w-full rounded-xl border border-gray-100 shadow-sm">
+            </div>
+            <div class="md:w-1/2">
+                <h3 class="text-2xl font-bold mb-6 text-gray-800">ព្យញ្ជនៈជាន់, ស្រៈឯករាជ្យ និងសញ្ញាពិសេសៗ</h3>
+                <p class="text-gray-600 mb-6 font-medium">ចំពោះស្រៈពេញតួ និងសញ្ញាពិសេសផ្សេងៗ ត្រូវបានប្រមូលផ្តុំនៅលើប៊ូតុង ឥៗ តែមួយគត់។</p>
+                <div class="bg-blue-50 p-6 rounded-xl inline-block">
+                    <p class="text-blue-700 font-bold text-lg">ចុចប៊ូតុងនេះ ១ដង គឺជាប៊ូតុងសម្រាប់ផ្ជង់ព្យញ្ជនៈ ហើយចុច ២ដង គឺជាប៊ូតុង ឥៗ។</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <section id="pc-version" class="py-20 bg-gray-900 text-white">
         <div class="max-w-6xl mx-auto px-6 text-center">
-            <h2 class="text-3xl font-bold mb-6">บัวคี (Buakey) มีให้ใช้งานบน PC ด้วย!</h2>
+            <h2 class="text-3xl font-bold mb-6">នៅលើ PC ក៏មាន សបយក ដែរ!</h2>
             <p class="text-gray-400 mb-10 max-w-2xl mx-auto">
-                บัวคี (Buakey) มีออปชันแสดงผังแป้นพิมพ์ขนาดเล็กบนหน้าจอ เพียงติดตั้งโปรแกรมก็เริ่มใช้งานบนคีย์บอร์ดเดิมได้ทันที เนื่องจากมีปุ่มที่ต้องจำน้อยมาก หากฝึกพิมพ์โดยดูผังเพียงไม่กี่วัน คุณจะสามารถพิมพ์สัมผัสได้โดยไม่ต้องมองแป้น
+                ដោយសារ សបយក អាចវាយដោយមិនមើលបានក្នុងរយៈពេលតែមួយថ្ងៃ អ្នកអាចវាយបញ្ចូលបានយ៉ាងងាយស្រួលនៅលើក្តារចុចដែលមានស្រាប់ផងដែរ។
             </p>
             <img src="images/pc1day.png" alt="PC ဗားရှင်း အသုံးပြုပုံ" class="mx-auto w-full max-w-2xl h-auto mb-10 rounded-lg shadow-2xl">
         </div>
     </section>
 
 <section id="demo" class="py-24 text-center">
-    <h2 class="text-3xl font-bold mb-16">ทดลองใช้งาน บัวคี (Buakey) ด้วยตัวคุณเอง</h2>
+    <h2 class="text-3xl font-bold mb-16">សាកល្បង សបយក ដោយខ្លួនឯង</h2>
     <div class="grid md:grid-cols-2 gap-10 max-w-4xl mx-auto px-6">
         <div class="p-10 rounded-3xl bg-white border border-gray-100 shadow-xl flex flex-col items-center">
-            <h4 class="text-xl font-bold mb-6 text-gray-800">Mobile บัวคี</h4>
+            <h4 class="text-xl font-bold mb-6 text-gray-800">Mobile សបយក</h4>
             <div class="h-32 flex items-center mb-8">
                 <img src="images/mobile.png" alt="မိုဘိုင်း စမ်းသပ်ခြင်း" class="max-h-full w-auto object-contain grayscale hover:grayscale-0 transition duration-500">
             </div>
-            <a href="mobile_demo.html" class="inline-block w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-blue-600 transition text-center">ทดลองใช้งาน</a>
+            <a href="mobile_demo.html" class="inline-block w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-blue-600 transition text-center">សាកល្បងប្រើ</a>
         </div>
         
         <div class="p-10 rounded-3xl bg-white border border-gray-100 shadow-xl flex flex-col items-center">
-            <h4 class="text-xl font-bold mb-6 text-gray-800">PC บัวคี</h4>
+            <h4 class="text-xl font-bold mb-6 text-gray-800">PC សបយក</h4>
             <div class="h-32 flex items-center mb-8">
                 <img src="images/pc.png" alt="PC တပ်ဆင်ခြင်း" class="max-h-full w-auto object-contain grayscale hover:grayscale-0 transition duration-500">
             </div>
-            <a href="try.html" class="inline-block w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-blue-600 transition text-center">กำลังเตรียมการ</a>
+            <a href="try.html" class="inline-block w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-blue-600 transition text-center">កំពុងរៀបចំ</a>
         </div>
     </div>
 </section>
 
 
     <footer class="py-12 border-t border-gray-100 text-center text-gray-400 text-sm">
-        <p>© 2026 Buakey All rights reserved.</p>
+        <p>© 2026 Sabaykey All rights reserved.</p>
     </footer>
 
 </body>
