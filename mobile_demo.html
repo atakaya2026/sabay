@@ -635,7 +635,7 @@ function render() {
           // idx != 0이면 chars 빈 채로 → '1▶' 표시 (비활성 힌트)
         }
         const b = makeOverlayBtn('kbd-next', style, () => handleNext());
-        b.textContent = chars.length > 0 ? chars.join('') : '1▶';
+        b.textContent = chars.length > 0 ? chars.join('') : '2';
         kbd.appendChild(b);
 
       } else if (rk.type === 'onext') {
@@ -650,7 +650,7 @@ function render() {
           }
         }
         const b = makeOverlayBtn('kbd-onext', style, () => handleONext());
-        b.textContent = chars.length > 0 ? chars.join('') : '2▶';
+        b.textContent = chars.length > 0 ? chars.join('') : '3‥';
         kbd.appendChild(b);
 
       } else if (rk.type === 'bs') {
