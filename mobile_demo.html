@@ -136,13 +136,7 @@
   .key-space.stack-active { background: #fef3c7; border: 2px solid #f59e0b; }
   .kbd-space.zwsp-active { background: #fef3c7 !important; border: 2px solid #f59e0b !important; }
   .kbd-space.dandaa-active { background: #dcfce7 !important; border: 2px solid #22c55e !important; }
-  .key-123{
-    background: #000093; color: #aaf; height: 11vw; border-radius: 6px;
-    display: flex; justify-content: center; align-items: center;
-    cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,0.25);
-    font-weight: bold; font-size: clamp(8px, 2.8vw, 16px); user-select: none;
-  }
-  .key-enter {
+  .key-123, .key-enter{
     background: #8e8e93; color: #fff; height: 11vw; border-radius: 6px;
     display: flex; justify-content: center; align-items: center;
     cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,0.25);
@@ -730,7 +724,7 @@ function renderPopup() {
   }
   const bb = document.createElement('div');
   bb.className = 'bottom-bar';
-  const k123 = document.createElement('div'); k123.className = 'key-123'; k123.textContent = 'Wallet'; bb.appendChild(k123);
+  const k123 = document.createElement('div'); k123.className = 'key-123'; k123.textContent = '123'; bb.appendChild(k123);
   const kSp = document.createElement('div'); kSp.className = 'key-space'; kSp.textContent = '✕';
   kSp.style.background = '#ef4444'; kSp.style.color = '#fff';
   kSp.addEventListener('pointerdown', (e) => { e.preventDefault(); closePopup(); });
