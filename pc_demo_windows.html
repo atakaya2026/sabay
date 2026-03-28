@@ -187,10 +187,11 @@ const popupRight = [
     { type:'char', chars:['ៗ','៖'] },     // b
     { type:'char', chars:['។','៕'] },     // n
     { type:'char', chars:['៘','ៜ'] },     // m
+    { type:'cursor' },                     // ,
   ],
 ];
 // 팝업 물리키 배열
-const POPUP_PHYS = [['t','y','u','i'], ['g','h','j','k'], ['b','n','m']];
+const POPUP_PHYS = [['t','y','u','i'], ['g','h','j','k'], ['b','n','m',',']];
 const popupKeyIndex = {};
 POPUP_PHYS.forEach((row,ri)=>row.forEach((k,ci)=>{ popupKeyIndex[k]={ri,ci}; }));
 
@@ -370,6 +371,7 @@ window.addEventListener('keydown', (e) => {
     if (pi) {
       const rk = popupRight[pi.ri][pi.ci];
       if (rk && rk.type === 'char') handlePopupChar(`p${pi.ri}c${pi.ci}`, rk.chars);
+      else if (rk && rk.type === 'cursor') { state.popupLastKey = null; state.popupTapIdx = 0; }
     }
     editor.scrollTop = editor.scrollHeight;
     return;
