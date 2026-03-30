@@ -379,23 +379,22 @@ window.addEventListener('keydown', (e) => {
 
   // ── 일반 모드 ───────────────────────────────────
 
-  // t y g h b n: 상시 직접 입력 (멀티탭 지원)
+  // t y g h b n: 1순위 문자 즉시 입력 + 팝업 모드 진입
   const alwaysKeys = new Set(['t','y','g','h','b','n']);
   if (alwaysKeys.has(k)) {
     const pi = popupKeyIndex[k];
     const rk = popupRight[pi.ri][pi.ci];
     if (rk && rk.type === 'char') {
-      const keyId = `always_${k}`;
-      if (state.popupLastKey === keyId) {
-        state.popupTapIdx = (state.popupTapIdx + 1) % rk.chars.length;
-        setText(getText().slice(0,-1) + rk.chars[state.popupTapIdx]);
-      } else {
-        state.popupLastKey = keyId;
-        state.popupTapIdx = 0;
-        appendText(rk.chars[0]);
-      }
+      const keyId = `p${pi.ri}c${pi.ci}`;
+      // 1순위 문자 입력
+      state.popupLastKey = keyId;
+      state.popupTapIdx = 0;
+      appendText(rk.chars[0]);
       state.activeRoot = null; state.activeCharIdx = 0;
       state.lastVowelKey = null; state.vowelTapIdx = 0;
+      // 팝업 모드 진입 (이미지 표시)
+      state.popupMode = true;
+      document.getElementById('popup-img').style.display = 'block';
       afterInput();
     }
     editor.scrollTop = editor.scrollHeight;
