@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>សប្បាយក · Sabayka PC Demo</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;700;900&family=Noto+Sans:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
   body {
     background: url('images/windows.png') no-repeat center center fixed;
@@ -35,6 +35,7 @@
     animation: blink 1s step-end infinite; font-weight: 100;
   }
   @keyframes blink { from, to { color: transparent; } 50% { color: black; } }
+  .caron { font-family: 'Noto Sans', Arial, sans-serif; font-size: 0.75em; color: #999; font-weight: 300; }
 
   /* ── 미니 내비 (pc_demo_windows 그대로) ── */
   #step-nav {
@@ -210,9 +211,24 @@ let state = {
 
 // ── 에디터 ──────────────────────────────────────
 const editor = document.getElementById('editor');
-const getText = () => editor.innerText;
-const setText = t => { editor.innerText = t; };
+
+function getText() { return editor.dataset.text || ''; }
+function setText(t) {
+  editor.dataset.text = t;
+  const esc = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+               .replace(/\n/g,'<br>');
+  editor.innerHTML = esc.replace(/\u02C7/g, '<span class="caron">ˇ</span>');
+}
 const appendText = c => setText(getText() + c);
+
+// 캐런 자동 삭제 + spaceMode 리셋
+function clearCaron() {
+  if (state.spaceMode === 1) {
+    const t = getText();
+    if (t.endsWith('\u02C7')) setText(t.slice(0, -1));
+  }
+  state.spaceMode = 0;
+}
 
 function replaceLastConsonant(c) {
   const t = getText(); if (!t.length) return;
@@ -244,7 +260,7 @@ function calcONextIdx(root, curIdx) {
 // ── 핸들러 (모바일 그대로) ──────────────────────
 function handleConsonant(char) {
   const root = getRoot(char);
-  if (state.spaceMode !== 0) state.spaceMode = 0;
+  clearCaron();
   if (state.stackMode) { appendText(char); state.stackMode = false; }
   else appendText(char);
   state.activeRoot = nasalConsonants.has(char) ? null : root;
@@ -253,7 +269,7 @@ function handleConsonant(char) {
   afterInput();
 }
 function handleNext() {
-  if (state.spaceMode !== 0) state.spaceMode = 0;
+  clearCaron();
   if (!state.activeRoot) return;
   const ni = calcNextIdx(state.activeRoot, state.activeCharIdx); if (ni === null) return;
   const c = consonantRows[state.activeRoot][ni]; if (!c) return;
@@ -262,7 +278,7 @@ function handleNext() {
   afterInput();
 }
 function handleONext() {
-  if (state.spaceMode !== 0) state.spaceMode = 0;
+  clearCaron();
   if (!state.activeRoot) return;
   const ni = calcONextIdx(state.activeRoot, state.activeCharIdx); if (ni === null) return;
   const c = consonantRows[state.activeRoot][ni]; if (!c) return;
@@ -271,7 +287,7 @@ function handleONext() {
   afterInput();
 }
 function handleVowel(keyId, chars) {
-  if (state.spaceMode !== 0) state.spaceMode = 0;
+  clearCaron();
   if (state.lastVowelKey === keyId) {
     state.vowelTapIdx = (state.vowelTapIdx + 1) % chars.length;
     setText(getText().slice(0,-1) + chars[state.vowelTapIdx]);
@@ -292,7 +308,7 @@ function handleStack() {
   afterInput();
 }
 function handleBS() {
-  if (state.spaceMode !== 0) state.spaceMode = 0;
+  clearCaron();
   doBackspace();
   state.lastVowelKey = null; state.vowelTapIdx = 0;
   const t = getText(); const last = t.length ? t[t.length-1] : null;
@@ -303,18 +319,20 @@ function handleBS() {
   afterInput();
 }
 function handleSpace() {
-  const ZWSP = '\u200B';
-  if (state.spaceMode === 1) {
+  if (state.spaceMode === 0) {
+    // 1탭: ZWSP + 캐런
+    appendText('\u200B\u02C7');
+    state.spaceMode = 1;
+  } else {
+    // 2탭 이후: 캐런 제거 후 공백
+    const tc = getText();
+    if (tc.endsWith('\u02C7')) setText(tc.slice(0, -1));
+    appendText(' ');
     state.spaceMode = 2;
-    const t = getText(); if (t.endsWith(ZWSP)) setText(t.slice(0,-1)+' ');
-    state.lastVowelKey = null; state.vowelTapIdx = 0; afterInput(); return;
   }
-  if (state.spaceMode >= 2) {
-    appendText(' '); state.lastVowelKey = null; state.vowelTapIdx = 0; afterInput(); return;
-  }
-  state.spaceMode = 1; state.activeRoot = null; state.activeCharIdx = 0;
+  state.activeRoot = null; state.activeCharIdx = 0;
   state.lastVowelKey = null; state.vowelTapIdx = 0;
-  appendText(ZWSP); afterInput();
+  afterInput();
 }
 
 // ── 팝업 핸들러 ──────────────────────────────────
@@ -386,6 +404,7 @@ window.addEventListener('keydown', (e) => {
     const rk = popupRight[pi.ri][pi.ci];
     if (rk && rk.type === 'char') {
       const keyId = `p${pi.ri}c${pi.ci}`;
+      clearCaron();
       // 1순위 문자 입력
       state.popupLastKey = keyId;
       state.popupTapIdx = 0;
@@ -402,11 +421,12 @@ window.addEventListener('keydown', (e) => {
   }
 
   if (k === 'backspace') { handleBS(); editor.scrollTop=editor.scrollHeight; return; }
-  if (k === 'enter')     { appendText('\n'); state.activeRoot=null; state.activeCharIdx=0; state.lastVowelKey=null; state.stackMode=false; state.spaceMode=0; afterInput(); editor.scrollTop=editor.scrollHeight; return; }
+  if (k === 'enter')     { clearCaron(); appendText('\n'); state.activeRoot=null; state.activeCharIdx=0; state.lastVowelKey=null; state.stackMode=false; afterInput(); editor.scrollTop=editor.scrollHeight; return; }
   if (k === ' ')         { handleSpace(); editor.scrollTop=editor.scrollHeight; return; }
 
   // stack(,) 키: 1타→stack, 2연타→팝업
   if (k === ',') {
+    clearCaron();
     if (lastWasComma) {
       // 2연타: stack 취소하고 팝업
       const t = getText();

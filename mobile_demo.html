@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;700&family=Noto+Sans:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 /* 1. 전체 배경: 화면 하단 정렬 */
@@ -44,6 +44,7 @@
   }
   #editor::after { content: none; }
   .cursor { color: #c8a96e; animation: blink 1s step-end infinite; font-weight: 100; }
+  .caron { font-family: 'Noto Sans', Arial, sans-serif; font-size: 0.75em; color: #999; font-weight: 300; }
   @keyframes blink { from, to { opacity: 0; } 50% { opacity: 1; } }
 
   #keyboard-wrap {
@@ -134,8 +135,7 @@
   }
   .key-space:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
   .key-space.stack-active { background: #fef3c7; border: 2px solid #f59e0b; }
-  .kbd-space.zwsp-active { background: #fef3c7 !important; border: 2px solid #f59e0b !important; }
-  .kbd-space.dandaa-active { background: #dcfce7 !important; border: 2px solid #22c55e !important; }
+  .kbd-space.stack-active { background: #fef3c7 !important; border: 2px solid #f59e0b !important; }
   .key-123, .key-enter{
     background: #8e8e93; color: #fff; height: 11vw; border-radius: 6px;
     display: flex; justify-content: center; align-items: center;
@@ -329,10 +329,9 @@ const editor = document.getElementById('editor');
 function getText() { return editor.dataset.text || ''; }
 function setText(t) {
   editor.dataset.text = t;
-  // innerHTML로 렌더: 텍스트 그대로 + 커서 span
   const escaped = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const cursorChar = state.spaceMode === 1 ? '⁝' : '|';
-  editor.innerHTML = escaped + `<span class="cursor">${cursorChar}</span>`;
+  const withCaron = escaped.replace(/\u02C7/g, '<span class="caron">ˇ</span>');
+  editor.innerHTML = withCaron + `<span class="cursor">|</span>`;
 }
 function appendText(c) { setText(getText() + c); }
 
@@ -357,11 +356,19 @@ function replaceLastConsonant(newChar) {
   }
 }
 
+// 캐런 자동 삭제 + spaceMode 리셋
+function clearCaron() {
+  if (state.spaceMode === 1) {
+    const t = getText();
+    if (t.endsWith('\u02C7')) setText(t.slice(0, -1));
+  }
+  state.spaceMode = 0;
+}
+
 // ── 핸들러 ──────────────────────────────────────
 function handleConsonant(char) {
   const root = getRoot(char);
-  // 새 입력: ZWSP 상태면 커서 원위치
-  if (state.spaceMode !== 0) state.spaceMode = 0;
+  clearCaron();
   if (state.stackMode) {
     // ្ 는 이미 입력창에 있음, 자음만 추가
     appendText(char);
@@ -377,7 +384,7 @@ function handleConsonant(char) {
 }
 
 function handleNext() {
-  if (state.spaceMode !== 0) state.spaceMode = 0;
+  clearCaron();
   if (!state.activeRoot) return;
   const nextIdx = calcNextIdx(state.activeRoot, state.activeCharIdx);
   if (nextIdx === null) return;
@@ -391,7 +398,7 @@ function handleNext() {
 }
 
 function handleONext() {
-  if (state.spaceMode !== 0) state.spaceMode = 0;
+  clearCaron();
   if (!state.activeRoot) return;
   const nextIdx = calcONextIdx(state.activeRoot, state.activeCharIdx);
   if (nextIdx === null) return;
@@ -405,7 +412,7 @@ function handleONext() {
 }
 
 function handleVowel(keyId, chars) {
-  if (state.spaceMode !== 0) state.spaceMode = 0;
+  clearCaron();
   if (state.lastVowelKey === keyId) {
     state.vowelTapIdx = (state.vowelTapIdx + 1) % chars.length;
     const t = getText();
@@ -421,33 +428,21 @@ function handleVowel(keyId, chars) {
 }
 
 function handleSpace() {
-  const ZWSP = '\u200B';
-
-  if (state.spaceMode === 1) {
-    // 2타: ZWSP→공백 교체
-    state.spaceMode = 2;
-    const t = getText();
-    if (t.endsWith(ZWSP)) setText(t.slice(0, -1) + ' ');
-    state.lastVowelKey = null;
-    state.vowelTapIdx = 0;
-    render();
-    return;
-  }
-  if (state.spaceMode >= 2) {
-    // 3타~: 공백 추가
+  if (state.spaceMode === 0) {
+    // 1탭: ZWSP + 캐런 삽입
+    appendText('\u200B\u02C7');
+    state.spaceMode = 1;
+  } else {
+    // 2탭 이후: 캐런 제거 후 공백 추가
+    const tc = getText();
+    if (tc.endsWith('\u02C7')) setText(tc.slice(0, -1));
     appendText(' ');
-    state.lastVowelKey = null;
-    state.vowelTapIdx = 0;
-    render();
-    return;
+    state.spaceMode = 2;
   }
-  // 기본(spaceMode=0): 1타 — ZWSP 삽입
-  state.spaceMode = 1;
   state.activeRoot = null;
   state.activeCharIdx = 0;
   state.lastVowelKey = null;
   state.vowelTapIdx = 0;
-  appendText(ZWSP);
   render();
 }
 
@@ -470,7 +465,7 @@ function handleStack() {
 
 
 function handleBS() {
-  if (state.spaceMode !== 0) state.spaceMode = 0;
+  clearCaron();
   backspace();
   state.lastVowelKey = null;
   state.vowelTapIdx = 0;
@@ -682,13 +677,13 @@ function render() {
   const lbl = document.createElement('div');
   lbl.className = 'kbd-space-label';
   lbl.style.cssText = `left:25.95%;top:${BOT_Y}%;width:48.75%;height:${BOT_H}%;`;
-  lbl.textContent = '⁝ ␣';
+  lbl.textContent = state.spaceMode >= 1 ? 'ចន្លោះ' : 'បំបែកពាក្យ';
   kbd.appendChild(lbl);
 
   // 엔터
   kbd.appendChild(makeOverlayBtn('kbd-enter', {
     left: '75.55%', top: BOT_Y + '%', width: '23.30%', height: BOT_H + '%'
-  }, () => { appendText('\n'); render(); }));
+  }, () => { clearCaron(); appendText('\n'); render(); }));
 }
 
 function renderPopup() {
