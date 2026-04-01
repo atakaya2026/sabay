@@ -30,7 +30,10 @@
 
 <!-- Hero Image Section -->
 <section class="w-full relative">
-    <img src="images/hero.png" alt="Sabayka Hero" class="w-full object-cover">
+    <picture>
+        <source media="(max-width: 767px)" srcset="images/hero_mobile.png">
+        <img src="images/hero.png" alt="Sabayka Hero" class="w-full object-cover">
+    </picture>
 </section>
 
 <section id="intro" class="py-20 bg-white text-center px-6">
