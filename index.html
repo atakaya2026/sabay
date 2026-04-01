@@ -136,23 +136,73 @@
 <section id="demo" class="py-24 text-center">
     <h2 class="text-3xl font-bold mb-16">សាកល្បង សប្បាយក ដោយខ្លួនឯង</h2>
     <div class="grid md:grid-cols-2 gap-10 max-w-4xl mx-auto px-6">
-        <div class="p-10 rounded-3xl bg-white border border-gray-100 shadow-xl flex flex-col items-center">
+
+        <!-- Mobile Card -->
+        <div class="p-10 rounded-3xl bg-white border border-gray-100 shadow-xl flex flex-col items-center relative overflow-hidden">
             <h4 class="text-xl font-bold mb-6 text-gray-800">Mobile សប្បាយក</h4>
             <div class="h-32 flex items-center mb-8">
                 <img src="images/mobile.png" alt="မိုဘိုင်း စမ်းသပ်ခြင်း" class="max-h-full w-auto object-contain grayscale hover:grayscale-0 transition duration-500">
             </div>
             <a href="mobile_demo.html" class="inline-block w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-blue-600 transition text-center">សាកល្បងប្រើ</a>
+
+            <!-- PC에서 볼 때: QR코드 오버레이 -->
+            <div id="mobile-overlay"
+                 class="absolute inset-0 rounded-3xl flex-col items-center justify-center gap-4 px-6"
+                 style="display:none; background:rgba(255,255,255,0.96); backdrop-filter:blur(4px);">
+                <h4 class="text-xl font-bold text-gray-800">Mobile សប្បាយក</h4>
+                <div id="qr-container" class="bg-white p-3 rounded-2xl shadow-md border border-gray-100"></div>
+                <p class="text-sm text-gray-500 text-center">📱 សូមស្កែន QR កូដដោយទូរស័ព្ទ<br>ដើម្បីសាកល្បងប្រើ</p>
+            </div>
         </div>
-        
-        <div class="p-10 rounded-3xl bg-white border border-gray-100 shadow-xl flex flex-col items-center">
+
+        <!-- PC Card -->
+        <div class="p-10 rounded-3xl bg-white border border-gray-100 shadow-xl flex flex-col items-center relative overflow-hidden">
             <h4 class="text-xl font-bold mb-6 text-gray-800">PC សប្បាយក</h4>
             <div class="h-32 flex items-center mb-8">
                 <img src="images/pc.png" alt="PC တပ်ဆင်ခြင်း" class="max-h-full w-auto object-contain grayscale hover:grayscale-0 transition duration-500">
             </div>
             <a href="try.html" class="inline-block w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-blue-600 transition text-center">កំពុងរៀបចំ</a>
+
+            <!-- 모바일에서 볼 때: PC 안내 오버레이 -->
+            <div id="pc-overlay"
+                 class="absolute inset-0 rounded-3xl flex-col items-center justify-center gap-4 px-6"
+                 style="display:none; background:rgba(255,255,255,0.96); backdrop-filter:blur(4px);">
+                <h4 class="text-xl font-bold text-gray-800">PC សប្បាយក</h4>
+                <span class="text-5xl">🖥️</span>
+                <p class="text-sm text-gray-500 text-center">មុខងារនេះត្រូវការក្តារចុច PC<br>សូមចូលប្រើតាមកុំព្យូទ័រ</p>
+            </div>
         </div>
+
     </div>
 </section>
+
+<!-- QR 라이브러리 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function() {
+    var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
+    var mobileOverlay = document.getElementById('mobile-overlay');
+    var pcOverlay = document.getElementById('pc-overlay');
+    var qrContainer = document.getElementById('qr-container');
+
+    if (!isMobile) {
+        // PC: 모바일 카드에 QR 오버레이
+        mobileOverlay.style.display = 'flex';
+        var mobileUrl = 'https://sabayka.com/mobile_demo.html';
+        new QRCode(qrContainer, {
+            text: mobileUrl,
+            width: 160,
+            height: 160,
+            colorDark: '#111827',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+        });
+    } else {
+        // 모바일: PC 카드에 안내 오버레이
+        pcOverlay.style.display = 'flex';
+    }
+})();
+</script>
 
 
     <footer class="py-12 border-t border-gray-100 text-center text-gray-400 text-sm">
