@@ -6,10 +6,44 @@
     <title>សប្បាយក</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="images/logo.png" type="image/png">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
-        body { font-family: 'Noto Sans KR', sans-serif; word-break: keep-all; }
-    </style>
+<style>
+    /* 태국어에 최적화된 Sarabun 폰트를 불러옵니다 */
+    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
+    
+    body { 
+        font-family: 'Sarabun', sans-serif; 
+        word-break: keep-all; 
+		line-break: loose;
+		overflow-x: hidden; /* 가로 스크롤 방지 */
+    }
+	span, p, h3 {
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+.hero-copy {
+    color: #ff0000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(2rem, 6vw, 4rem);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+    white-space: nowrap;
+    text-align: center;
+}
+@media (max-width: 767px) {
+    .hero-copy {
+        color: white;
+        top: auto;
+        bottom: 12%;
+        transform: translateX(-50%);
+        font-size: clamp(2rem, 11vw, 2rem);
+        white-space: normal;
+        width: 90%;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+        bottom: 18%;
+    }
+}
+</style>
 </head>
 <body class="bg-gray-50 text-gray-900 leading-relaxed">
 
@@ -32,8 +66,11 @@
 <section class="w-full relative">
     <picture>
         <source media="(max-width: 767px)" srcset="images/hero_mobile.png">
-        <img src="images/hero.png" alt="Sabayka Hero" class="w-full object-cover">
+        <img src="images/hero.png" alt="Hatabang Hero" class="w-full object-cover">
     </picture>
+    <p class="absolute font-bold leading-snug hero-copy">
+        យើងគឺជាជំនាន់សប្បាយក
+    </p>
 </section>
 
 <section id="intro" class="py-20 bg-white text-center px-6">
